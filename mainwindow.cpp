@@ -29,10 +29,12 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
     QMainWindow(parent),
     entryWindow(NULL),
     accountDialog(NULL),
+    editDocDialog(NULL),
     categoryDialog(NULL),
     m_transactions(transactions),
     m_entryModel(NULL),
     m_docModel(NULL),
+    m_docOverride(NULL),
     m_populate(true)
 {
     ui.setupUi(this);
@@ -135,6 +137,82 @@ void ASMainWindow::on_actionNewEntry_activated()
     entryWindow->exec();
 }
 
+void ASMainWindow::on_actionCorrectEntry_activated()
+{
+    createEntryWindow();
+
+    QItemSelectionModel * sm = ui.mainTable->selectionModel();
+
+    if (sm && sm->hasSelection())
+    {
+        QModelIndex mi = sm->currentIndex();
+        if (mi.isValid())
+        {
+            ASAccountEntry * ae = m_entryModel->getTransactionByRow(mi.row());
+            if (ae)
+            {
+                entryWindow->setOverride(ae);
+                entryWindow->exec();
+            }
+            else
+            {
+                QMessageBox::critical(this,
+                                      tr("Fehler"),
+                                      tr("Bitte wählen Sie die Buchun, "
+                                         "die ersetzt werden soll."));
+            }
+        }
+    }
+}
+
+void ASMainWindow::on_actionNewDocument_activated()
+{
+    m_docOverride = NULL;
+
+    if (!editDocDialog)
+    {
+        editDocDialog = new QDialog(this);
+        editDocUi.setupUi(editDocDialog);
+        connect(editDocDialog, SIGNAL(accepted()),
+                this, SLOT(createDocument()));
+    }
+    editDocUi.description->setFocus();
+    editDocDialog->show();
+}
+
+void ASMainWindow::on_actionCorrectDocument_activated()
+{
+    if (!docDialog->exec())
+        return;
+
+    QItemSelectionModel * sm = docUi.tableView->selectionModel();
+
+    if (sm && sm->hasSelection())
+    {
+        QModelIndex mi = sm->currentIndex();
+        if (mi.isValid())
+        {
+            m_docOverride = m_docModel->getTransactionByRow(mi.row());
+            if (m_docOverride)
+            {
+                if (!editDocDialog)
+                {
+                    editDocDialog = new QDialog(this);
+                    editDocUi.setupUi(editDocDialog);
+                    connect(editDocDialog, SIGNAL(accepted()),
+                            this, SLOT(createDocument()));
+                }
+                editDocUi.description->setText(m_docOverride->getDescription());
+                editDocUi.date->setDate(m_docOverride->getDocumentDate());
+                editDocUi.documentNumber->setText(m_docOverride->getNumber());
+                editDocUi.documentId->setText(m_docOverride->getId());
+                editDocUi.description->setFocus();
+                editDocDialog->show();
+            }
+        }
+    }
+}
+
 void ASMainWindow::on_actionNewAccount_activated()
 {
     if (!accountDialog)
@@ -156,6 +234,7 @@ void ASMainWindow::on_actionNewAccount_activated()
                                         QVariant::fromValue((void*)a));
         }
     }
+    accountUi.description->setFocus();
     accountDialog->show();
 }
 
@@ -181,6 +260,7 @@ void ASMainWindow::on_actionNewCategory_activated()
                                          QVariant::fromValue((void*)c));
         }
     }
+    categoryUi.description->setFocus();
     categoryDialog->show();
 }
 
@@ -333,6 +413,28 @@ void ASMainWindow::createAccount()
     a->commit();
 
     m_populate = true;
+}
+
+void ASMainWindow::createDocument()
+{
+    QString desc = editDocUi.description->text();
+
+    if (desc.isEmpty())
+    {
+        QMessageBox::critical(this,
+                              tr("Fehler"),
+                              tr("Beschreibung erforderlich!"));
+        return;
+    }
+
+    ASDocument * d = new ASDocument(m_transactions, m_docOverride);
+    d->setDescription(desc);
+    d->setDocumentDate(editDocUi.date->date());
+    d->setNumber(editDocUi.documentNumber->text());
+    d->setId(editDocUi.documentId->text());
+    d->commit();
+
+    m_docOverride = NULL;
 }
 
 void ASMainWindow::createCategory()

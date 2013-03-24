@@ -60,11 +60,24 @@ QVariant DocModel::data(const QModelIndex& index, int role) const
     if (!index.isValid())
          return QVariant();
 
-    if (role == Qt::FontRole && index.row() == 0)
+    if (role == Qt::FontRole)
     {
-        QFont f = QApplication::font();
-        f.setBold(true);
-        return f;
+        if (index.row() == 0)
+        {
+            QFont f = QApplication::font();
+            f.setBold(true);
+            return f;
+        }
+        else if (index.row() > 0)
+        {
+            ASDocument * d = getSubsetList()[index.row()-1];
+            if (d->getOverwrittenBy() != NULL)
+            {
+                QFont f = QApplication::font();
+                f.setStrikeOut(true);
+                return f;
+            }
+        }
     }
 
     if (role != Qt::DisplayRole)
@@ -94,7 +107,7 @@ QVariant DocModel::data(const QModelIndex& index, int role) const
     case 0:
         return e->getDescription();
     case 1:
-        return e->getDocumentDate();
+        return e->getDocumentDate().toString(tr("dd.MM.yyyy"));
     case 2:
         return e->getNumber();
     case 3:
@@ -102,13 +115,4 @@ QVariant DocModel::data(const QModelIndex& index, int role) const
     }
 
     return QVariant();
-}
-
-ASDocument * DocModel::getDocumentByRow(int row)
-{
-    QList<ASDocument*> l = getSubsetList();
-    int r = row - 1;
-    if (r < 0 || l.size() <= r)
-        return NULL;
-    return l.at(r);
 }

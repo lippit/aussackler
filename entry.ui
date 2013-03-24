@@ -107,7 +107,14 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QLineEdit" name="vatAmount"/>
+       <widget class="QLineEdit" name="vatAmount">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="6" column="0">
        <widget class="QLabel" name="label_5">
@@ -118,6 +125,12 @@
       </item>
       <item row="2" column="1">
        <widget class="QDateEdit" name="transactionDate">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="displayFormat">
          <string>dd.MM.yyyy</string>
         </property>
@@ -128,6 +141,12 @@
       </item>
       <item row="6" column="1">
        <widget class="QSpinBox" name="chargePercentage">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="suffix">
          <string>%</string>
         </property>
@@ -155,6 +174,12 @@
       </item>
       <item row="3" column="1">
        <widget class="QLineEdit" name="amount">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -175,7 +200,14 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QComboBox" name="vatPercentage"/>
+       <widget class="QComboBox" name="vatPercentage">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_10">
@@ -185,7 +217,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="category"/>
+       <widget class="QComboBox" name="category">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -204,7 +243,14 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="documentId"/>
+       <widget class="QLineEdit" name="documentId">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_9">
@@ -214,7 +260,14 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="documentNumber"/>
+       <widget class="QLineEdit" name="documentNumber">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_7">
@@ -235,6 +288,12 @@
       </item>
       <item row="1" column="1">
        <widget class="QDateEdit" name="documentDate">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="displayFormat">
          <string>dd.MM.yyyy</string>
         </property>
@@ -245,6 +304,12 @@
       </item>
       <item row="4" column="1">
        <widget class="QPushButton" name="chooseDocument">
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="text">
          <string>Vorhandenen wählen</string>
         </property>
@@ -305,20 +370,20 @@
   <tabstop>entryDescription</tabstop>
   <tabstop>transactionDate</tabstop>
   <tabstop>amount</tabstop>
+  <tabstop>vatAmount</tabstop>
+  <tabstop>vatPercentage</tabstop>
+  <tabstop>chargePercentage</tabstop>
   <tabstop>documentDescription</tabstop>
   <tabstop>documentDate</tabstop>
   <tabstop>documentNumber</tabstop>
   <tabstop>documentId</tabstop>
   <tabstop>chooseDocument</tabstop>
   <tabstop>depreciationPeriod</tabstop>
-  <tabstop>vatAmount</tabstop>
-  <tabstop>vatPercentage</tabstop>
-  <tabstop>chargePercentage</tabstop>
+  <tabstop>buttonBox</tabstop>
   <tabstop>expense</tabstop>
   <tabstop>income</tabstop>
   <tabstop>invest</tabstop>
   <tabstop>account</tabstop>
-  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections>

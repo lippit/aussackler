@@ -101,6 +101,8 @@ public:
     const QDateTime getCreationTimestamp() const;
     const QUuid getUuid() const;
     const ASTransaction * getOverride() const;
+    const ASTransaction * getOverwrittenBy() const;
+    const ASTransaction * getLatest() const;
     bool isNull() const;
     bool isCommited() const;
 
@@ -122,6 +124,7 @@ protected:
     QDateTime m_creationTimestamp;
     QUuid m_uuid;
     ASTransaction * m_overrides;
+    ASTransaction * m_overwrittenBy;
     ASTransactionList * m_transactions;
     bool m_committed;
 

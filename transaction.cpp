@@ -47,6 +47,7 @@ void ASTransactionList::append(ASTransaction * value)
 
 ASTransaction::ASTransaction(ASTransactionList * transactions,
                              ASTransaction * overrides) :
+    m_overwrittenBy(NULL),
     m_transactions(transactions),
     m_committed(false)
 {
@@ -55,6 +56,10 @@ ASTransaction::ASTransaction(ASTransactionList * transactions,
         m_uuid = QUuid::createUuid();
         m_creationTimestamp = QDateTime::currentDateTime();
         m_overrides = overrides;
+        if (m_overrides)
+        {
+            m_overrides->m_overwrittenBy = this;
+        }
     }
 }
 
@@ -88,6 +93,21 @@ const QUuid ASTransaction::getUuid() const
 const ASTransaction * ASTransaction::getOverride() const
 {
     return m_overrides;
+}
+
+const ASTransaction * ASTransaction::getOverwrittenBy() const
+{
+    return m_overwrittenBy;
+}
+
+const ASTransaction * ASTransaction::getLatest() const
+{
+    const ASTransaction * latest = this;
+    while (latest->m_overwrittenBy)
+    {
+        latest = latest->m_overwrittenBy;
+    }
+    return latest;
 }
 
 bool ASTransaction::isNull() const
@@ -130,6 +150,10 @@ void ASTransaction::readFromXml(QDomElement * de)
     {
         QUuid overrides = de->attribute("overrides");
         m_overrides = m_transactions->getByUuid(overrides);
+        if (m_overrides)
+        {
+            m_overrides->m_overwrittenBy = this;
+        }
     }
 
     QDomNode n = de->firstChild();

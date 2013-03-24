@@ -36,6 +36,7 @@ public:
                   QWidget * parent = 0);
 
     void populateLists();
+    void setOverride(ASTransaction * override);
 
 private slots:
     void on_expense_toggled(bool checked);
@@ -47,6 +48,7 @@ private slots:
 
     void chooseDocument(bool buttonOn);
     void documentSelected();
+    void documentSetup();
     void documentReset();
 
 private:
@@ -55,6 +57,7 @@ private:
     Ui::DocumentsWindow * m_docUi;
     QDialog * m_docDialog;
     ASDocument * m_selectedDocument;
+    ASTransaction * m_override;
 
     void calculateVat();
 };

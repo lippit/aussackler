@@ -30,7 +30,8 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
     m_transactions(transactions),
     m_docUi(docUi),
     m_docDialog(docDialog),
-    m_selectedDocument(NULL)
+    m_selectedDocument(NULL),
+    m_override(NULL)
 {
     ui.setupUi(this);
     ui.transactionDate->setDate(QDate::currentDate());
@@ -42,18 +43,13 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
     ui.vatAmount->setValidator(val);
 
     // VAT Entries
+
     ui.vatPercentage->addItem("20 %", 20);
     ui.vatPercentage->addItem("10 %", 10);
     ui.vatPercentage->addItem("Anderer", -1);
 
     connect(ui.chooseDocument, SIGNAL(toggled(bool)),
             this, SLOT(chooseDocument(bool)));
-
-    connect(docDialog, SIGNAL(accepted()),
-            this, SLOT(documentSelected()));
-
-    connect(docDialog, SIGNAL(rejected()),
-            this, SLOT(documentReset()));
 }
 
 void ASEntryWindow::populateLists()
@@ -139,13 +135,13 @@ void ASEntryWindow::on_buttonBox_accepted()
     ASInvestEntry * ie = NULL;
     if (ui.invest->isChecked())
     {
-        ie = new ASInvestEntry(m_transactions);
+        ie = new ASInvestEntry(m_transactions, m_override);
         ie->setDepreciationPeriod(ui.depreciationPeriod->value());
         e = ie;
     }
     else
     {
-        e = new ASAccountEntry(m_transactions);
+        e = new ASAccountEntry(m_transactions, m_override);
         e->setCategory((ASCategory*)ui.category->itemData(
                            ui.category->currentIndex()).value<void *>());
     }
@@ -189,11 +185,65 @@ void ASEntryWindow::on_buttonBox_accepted()
     ui.entryDescription->setFocus();
 }
 
+void ASEntryWindow::setOverride(ASTransaction * override)
+{
+    if (!override)
+        return;
+
+    ASAccountEntry * ae = dynamic_cast<ASAccountEntry*>(override);
+    if (!ae)
+        return;
+
+    for (int i=0; i<ui.category->count(); ++i)
+    {
+        if (ae->getCategory() &&
+            ui.category->itemText(i) == ae->getCategory()->getDescription())
+        {
+            ui.category->setCurrentIndex(i);
+            break;
+        }
+    }
+    ui.entryDescription->setText(ae->getDescription());
+    ui.transactionDate->setDate(ae->getDate());
+    ui.amount->setText(QString::number(ae->getAmount()));
+    ui.vatAmount->setText(QString::number(ae->getVatAmount()));
+    for (int i=0; i<ui.vatPercentage->count(); ++i)
+    {
+        if(ae->getVatPercentage() ==
+           ui.vatPercentage->itemData(i).value<int>())
+        {
+            ui.vatPercentage->setCurrentIndex(i);
+        }
+    }
+    ui.chargePercentage->setValue(ae->getChargePercentage());
+
+    ASInvestEntry * ie = dynamic_cast<ASInvestEntry*>(ae);
+    if (ie)
+    {
+        ui.invest->click();
+        ui.depreciationPeriod->setValue(ie->getDepreciationPeriod());
+    }
+
+    m_selectedDocument = (ASDocument*)ae->getDocument();
+
+    documentSetup();
+
+    m_override = override;
+}
+
 void ASEntryWindow::chooseDocument(bool buttonOn)
 {
     if (buttonOn)
     {
+        connect(m_docDialog, SIGNAL(accepted()),
+                this, SLOT(documentSelected()));
+        connect(m_docDialog, SIGNAL(rejected()),
+                this, SLOT(documentReset()));
         m_docDialog->exec();
+        disconnect(m_docDialog, SIGNAL(accepted()),
+                   this, SLOT(documentSelected()));
+        disconnect(m_docDialog, SIGNAL(rejected()),
+                   this, SLOT(documentReset()));
     }
     else
     {
@@ -213,18 +263,10 @@ void ASEntryWindow::documentSelected()
             DocModel * model = dynamic_cast<DocModel*>(m_docUi->tableView->model());
             if (model)
             {
-                m_selectedDocument = model->getDocumentByRow(mi.row());
+                m_selectedDocument = model->getTransactionByRow(mi.row());
                 if (m_selectedDocument)
                 {
-                    ui.documentDescription->setText(m_selectedDocument->getDescription());
-                    ui.documentDate->setDate(m_selectedDocument->getDocumentDate());
-                    ui.documentNumber->setText(m_selectedDocument->getNumber());
-                    ui.documentId->setText(m_selectedDocument->getId());
-                    ui.documentDescription->setEnabled(false);
-                    ui.documentDate->setEnabled(false);
-                    ui.documentNumber->setEnabled(false);
-                    ui.documentId->setEnabled(false);
-
+                    documentSetup();
                     return;
                 }
             }
@@ -234,9 +276,25 @@ void ASEntryWindow::documentSelected()
     documentReset();
 }
 
+void ASEntryWindow::documentSetup()
+{
+    if (m_selectedDocument)
+    {
+        ui.documentDescription->setText(m_selectedDocument->getDescription());
+        ui.documentDate->setDate(m_selectedDocument->getDocumentDate());
+        ui.documentNumber->setText(m_selectedDocument->getNumber());
+        ui.documentId->setText(m_selectedDocument->getId());
+        ui.documentDescription->setEnabled(false);
+        ui.documentDate->setEnabled(false);
+        ui.documentNumber->setEnabled(false);
+        ui.documentId->setEnabled(false);
+    }
+}
+
 void ASEntryWindow::documentReset()
 {
     m_selectedDocument = NULL;
+    m_override = NULL;
 
     ui.documentDescription->setEnabled(true);
     ui.documentDate->setEnabled(true);

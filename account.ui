@@ -75,6 +75,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>description</tabstop>
+  <tabstop>replaces</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

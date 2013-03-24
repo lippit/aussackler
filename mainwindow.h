@@ -22,6 +22,7 @@
 
 #include "ui_mainwindow.h"
 #include "ui_account.h"
+#include "ui_document.h"
 #include "ui_category.h"
 #include "ui_doclist.h"
 #include "entrywindow.h"
@@ -46,25 +47,32 @@ private slots:
 
     void on_actionAddEntries_activated();
     void on_actionNewEntry_activated();
+    void on_actionCorrectEntry_activated();
+    void on_actionNewDocument_activated();
+    void on_actionCorrectDocument_activated();
     void on_actionNewAccount_activated();
     void on_actionNewCategory_activated();
 
     void createAccount();
+    void createDocument();
     void createCategory();
 
 private:
     QString m_currentFileName;
     Ui::MainWindow ui;
     Ui::AccountWindow accountUi;
+    Ui::DocumentWindow editDocUi;
     Ui::CategoryWindow categoryUi;
     Ui::DocumentsWindow docUi;
     ASEntryWindow * entryWindow;
     QDialog * accountDialog;
+    QDialog * editDocDialog;
     QDialog * categoryDialog;
     QDialog * docDialog;
     ASTransactionList * m_transactions;
     EntryModel * m_entryModel;
     DocModel * m_docModel;
+    ASDocument * m_docOverride;
     QString m_fileFilter;
     bool m_populate;
 

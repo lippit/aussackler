@@ -61,17 +61,30 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
     if (!index.isValid())
          return QVariant();
 
-    if (role == Qt::FontRole && index.row() == 0)
+    if (role == Qt::FontRole)
     {
-        QFont f = QApplication::font();
-        f.setBold(true);
-        return f;
+        if (index.row() == 0)
+        {
+            QFont f = QApplication::font();
+            f.setBold(true);
+            return f;
+        }
+        else if (index.row() > 0)
+        {
+            ASAccountEntry * e = getSubsetList()[index.row()-1];
+            if (e->getOverwrittenBy() != NULL)
+            {
+                QFont f = QApplication::font();
+                f.setStrikeOut(true);
+                return f;
+            }
+        }
     }
 
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    if (index.row() == 0)
+    if (role == Qt::DisplayRole && index.row() == 0)
     {
         switch(index.column())
         {
@@ -114,9 +127,20 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
         return e->getVatAmount();
     case 4:
         if (e->getVatPercentage() >= 0.0)
+        {
             return QString::number(e->getVatPercentage()) + " %";
+        }
         else
-            return "Unbekannt";
+        {
+            if (e->getVatAmount() == 0.0)
+            {
+                return tr("Keiner");
+            }
+            else
+            {
+                return "Unbekannt";
+            }
+        }
     case 5:
         return QString::number(e->getChargePercentage()) + " %";
     case 6:
@@ -131,15 +155,20 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
             return "";
     case 8:
         if (e->getDocument())
-            return e->getDocument()->getDescription();
+            return e->getDocument()->getLatest()->getDescription();
         else
             return "";
     case 9:
         if (e->getDocument())
-            return e->getDocument()->getDocumentDate().
-                toString(tr("dd.MM.yyyy"));
-        else
-            return "";
+        {
+            const ASDocument * d =
+                dynamic_cast<const ASDocument*>(e->getDocument()->getLatest());
+            if (d)
+            {
+                return d->getDocumentDate().toString(tr("dd.MM.yyyy"));
+            }
+        }
+        return "";
     }
 
     return QVariant();
