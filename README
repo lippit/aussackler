@@ -1,0 +1,13 @@
+Aussackler - Steuerabrechnungssoftware
+
+Diese Software ermöglicht einfache Buchhaltung mittels Einnahmen/Ausgaben-Rechnung und die Erstellung
+von Jahresabschlüssen. Zukünftig soll es auch möglich sein, Jahresabschlüsse direkt zur
+Übermittlung an das Finanzamt zu erstellen.
+
+Im Gegensatz zu genearlisierten Buchhaltungs-Programmen (wie z.B. GnuCash, KMyMoney) ist Aussackler
+als sehr einfaches E/A-Rechnungsprogramm speziell für Freelancer und Einzelunternehmer vorgesehen.
+Doppelte Buchführung und erweiterte Tools (Debitoren-Konten, usw.) werden NICHT unterstützt!
+
+ACHTUNG: Das Programm befindet sich noch in einem sehr frühen Entwicklungsstadium und ist für den
+Produktiveinsatz nur sehr bedingt geeignet!
+
