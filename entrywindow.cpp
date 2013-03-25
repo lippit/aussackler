@@ -41,6 +41,30 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
         new QDoubleValidator(-1000000.0, 1000000.0, 2, this);
     ui.amount->setValidator(val);
     ui.vatAmount->setValidator(val);
+    ui.totalAmount->setValidator(val);
+
+    // Completers
+
+    QStringList entryList;
+    QStringList documentList;
+
+    ASTransactionList::const_iterator it = transactions->constBegin();
+    for (; it != transactions->constEnd(); ++it)
+    {
+        if (dynamic_cast<ASAccountEntry*>(*it))
+        {
+            entryList.append((*it)->getDescription());
+        }
+        else if (dynamic_cast<ASDocument*>(*it))
+        {
+            documentList.append((*it)->getDescription());
+        }
+    }
+
+    m_entryCompleter = new QCompleter(entryList, this);
+    m_docCompleter = new QCompleter(documentList, this);
+    ui.entryDescription->setCompleter(m_entryCompleter);
+    ui.documentDescription->setCompleter(m_docCompleter);
 
     // VAT Entries
 
@@ -105,7 +129,32 @@ void ASEntryWindow::on_invest_toggled(bool checked)
     ui.investGroup->setEnabled(checked);
 }
 
-void ASEntryWindow::on_amount_textChanged()
+void ASEntryWindow::on_entryDescription_textChanged()
+{
+    if (!ui.documentDescription->isModified() &&
+        ui.documentDescription->isEnabled())
+    {
+        ui.documentDescription->setText(ui.entryDescription->text());
+    }
+
+    if (m_transactions->size() == 0)
+        return;
+
+    int i = 0;
+    ASTransactionList::const_iterator it = m_transactions->constEnd();
+    do {
+        it--;
+        ASAccountEntry * e = dynamic_cast<ASAccountEntry*>(*it);
+        if (e && e->getDescription() == ui.entryDescription->text())
+        {
+            fillFields(e);
+            ui.transactionDate->setDate(e->getDate().addMonths(1));
+            break;
+        }
+    } while(it != m_transactions->constBegin() && ++i < 1000);
+}
+
+void ASEntryWindow::on_amount_textEdited()
 {
     if (!ui.invest->isChecked())
     {
@@ -119,14 +168,49 @@ void ASEntryWindow::on_amount_textChanged()
             ui.income->setChecked(true);
         }
     }
-        
+
     calculateVat();
+    setVatPercentage();
+    calculateTotal();
+}
+
+void ASEntryWindow::on_vatAmount_textEdited()
+{
+    setVatPercentage();
+    calculateTotal();
+}
+
+void ASEntryWindow::on_totalAmount_textEdited()
+{
+    double totalAmount = ui.totalAmount->text().toDouble();
+
+    if (!ui.amount->isModified())
+    {
+        double vp = ui.vatPercentage->itemData(
+            ui.vatPercentage->currentIndex()).value<int>();
+        if (vp > 0.0)
+        {
+            double amount = qRound(100.0 * totalAmount /
+                                   (1.0 + (vp / 100.0))) / 100.0;
+            double vatAmount = totalAmount - amount;
+            ui.amount->setText(QString::number(amount));
+            ui.vatAmount->setText(QString::number(vatAmount));
+        }
+    }
+    else
+    {
+        double amount = ui.amount->text().toDouble();
+        double vatAmount = totalAmount - amount;
+        ui.vatAmount->setText(QString::number(vatAmount));
+    }
+    setVatPercentage();
 }
 
 void ASEntryWindow::on_vatPercentage_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
     calculateVat();
+    calculateTotal();
 }
 
 void ASEntryWindow::on_buttonBox_accepted()
@@ -177,11 +261,23 @@ void ASEntryWindow::on_buttonBox_accepted()
 
     e->commit();
 
+    QStringListModel * slm = dynamic_cast<QStringListModel*>
+        (m_entryCompleter->model());
+    if (slm)
+    {
+        QStringList sl = slm->stringList();
+        sl.append(ui.entryDescription->text());
+        slm->setStringList(sl);
+    }
+
     documentReset();
     ui.entryDescription->setText("");
     ui.amount->setText("");
     ui.vatAmount->setText("");
+    ui.totalAmount->setText("");
+    ui.amount->setModified(false);
     ui.vatAmount->setModified(false);
+    ui.totalAmount->setModified(false);
     ui.entryDescription->setFocus();
 }
 
@@ -194,6 +290,24 @@ void ASEntryWindow::setOverride(ASTransaction * override)
     if (!ae)
         return;
 
+    fillFields(ae);
+
+    ASInvestEntry * ie = dynamic_cast<ASInvestEntry*>(ae);
+    if (ie)
+    {
+        ui.invest->click();
+        ui.depreciationPeriod->setValue(ie->getDepreciationPeriod());
+    }
+
+    m_selectedDocument = (ASDocument*)ae->getDocument();
+
+    documentSetup();
+
+    m_override = override;
+}
+
+void ASEntryWindow::fillFields(ASAccountEntry * ae)
+{
     for (int i=0; i<ui.category->count(); ++i)
     {
         if (ae->getCategory() &&
@@ -213,22 +327,10 @@ void ASEntryWindow::setOverride(ASTransaction * override)
            ui.vatPercentage->itemData(i).value<int>())
         {
             ui.vatPercentage->setCurrentIndex(i);
+            break;
         }
     }
     ui.chargePercentage->setValue(ae->getChargePercentage());
-
-    ASInvestEntry * ie = dynamic_cast<ASInvestEntry*>(ae);
-    if (ie)
-    {
-        ui.invest->click();
-        ui.depreciationPeriod->setValue(ie->getDepreciationPeriod());
-    }
-
-    m_selectedDocument = (ASDocument*)ae->getDocument();
-
-    documentSetup();
-
-    m_override = override;
 }
 
 void ASEntryWindow::chooseDocument(bool buttonOn)
@@ -288,6 +390,9 @@ void ASEntryWindow::documentSetup()
         ui.documentDate->setEnabled(false);
         ui.documentNumber->setEnabled(false);
         ui.documentId->setEnabled(false);
+        ui.documentDescription->setModified(false);
+        ui.documentNumber->setModified(false);
+        ui.documentId->setModified(false);
     }
 }
 
@@ -306,7 +411,7 @@ void ASEntryWindow::documentReset()
 
 void ASEntryWindow::calculateVat()
 {
-    if (!ui.amount->text().isEmpty() && !ui.vatAmount->isModified())
+    if (!ui.amount->text().isEmpty())
     {
         double vp = ui.vatPercentage->itemData(
             ui.vatPercentage->currentIndex()).value<int>();
@@ -316,4 +421,31 @@ void ASEntryWindow::calculateVat()
             ui.vatAmount->setText(QString::number(vat));
         }
     }
+}
+
+void ASEntryWindow::setVatPercentage()
+{
+    double amount = ui.amount->text().toDouble();
+    double vatAmount = ui.vatAmount->text().toDouble();
+
+    int vat = qRound(100.0 * vatAmount / amount);
+
+    for (int i=0; i<ui.vatPercentage->count(); ++i)
+    {
+        if(vat == ui.vatPercentage->itemData(i).value<int>())
+        {
+            ui.vatPercentage->setCurrentIndex(i);
+            return;
+        }
+    }
+    ui.vatPercentage->setCurrentIndex(ui.vatPercentage->count()-1);
+}
+
+void ASEntryWindow::calculateTotal()
+{
+    double amount = ui.amount->text().toDouble();
+    double vatAmount = ui.vatAmount->text().toDouble();
+    double total = amount + vatAmount;
+
+    ui.totalAmount->setText(QString::number(total));
 }

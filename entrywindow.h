@@ -20,9 +20,12 @@
 #ifndef ENTRYWINDOW_H
 #define ENTRYWINDOW_H
 
+#include <QCompleter>
+#include <QStringListModel>
 #include "ui_entry.h"
 #include "ui_doclist.h"
 #include "transaction.h"
+#include "entry.h"
 #include "document.h"
 
 class ASEntryWindow : public QDialog
@@ -42,7 +45,10 @@ private slots:
     void on_expense_toggled(bool checked);
     void on_income_toggled(bool checked);
     void on_invest_toggled(bool checked);
-    void on_amount_textChanged();
+    void on_entryDescription_textChanged();
+    void on_amount_textEdited();
+    void on_vatAmount_textEdited();
+    void on_totalAmount_textEdited();
     void on_vatPercentage_currentIndexChanged(int index);
     void on_buttonBox_accepted();
 
@@ -51,6 +57,8 @@ private slots:
     void documentSetup();
     void documentReset();
 
+    void fillFields(ASAccountEntry * e);
+
 private:
     Ui::EntryWindow ui;
     ASTransactionList * m_transactions;
@@ -58,8 +66,12 @@ private:
     QDialog * m_docDialog;
     ASDocument * m_selectedDocument;
     ASTransaction * m_override;
+    QCompleter * m_entryCompleter;
+    QCompleter * m_docCompleter;
 
     void calculateVat();
+    void setVatPercentage();
+    void calculateTotal();
 };
 
 #endif
