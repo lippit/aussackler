@@ -104,9 +104,12 @@ void ASEntryWindow::on_expense_toggled(bool checked)
     if (checked)
     {
         double val = ui.amount->text().toDouble();
+        double vat = ui.vatAmount->text().toDouble();
         if (val > 0.0)
         {
             ui.amount->setText(QString::number(-val));
+            ui.vatAmount->setText(QString::number(-vat));
+            calculateTotal();
         }
     }
 }
@@ -116,9 +119,12 @@ void ASEntryWindow::on_income_toggled(bool checked)
 if (checked)
     {
         double val = ui.amount->text().toDouble();
+        double vat = ui.vatAmount->text().toDouble();
         if (val < 0.0)
         {
             ui.amount->setText(QString::number(-val));
+            ui.vatAmount->setText(QString::number(-vat));
+            calculateTotal();
         }
     }
 }
@@ -308,6 +314,15 @@ void ASEntryWindow::setOverride(ASTransaction * override)
 
 void ASEntryWindow::fillFields(ASAccountEntry * ae)
 {
+    for (int i=0; i<ui.account->count(); ++i)
+    {
+        if (ae->getAccount() &&
+            ui.account->itemText(i) == ae->getAccount()->getDescription())
+        {
+            ui.account->setCurrentIndex(i);
+            break;
+        }
+    }
     for (int i=0; i<ui.category->count(); ++i)
     {
         if (ae->getCategory() &&
@@ -425,8 +440,15 @@ void ASEntryWindow::calculateVat()
 
 void ASEntryWindow::setVatPercentage()
 {
+    if (ui.amount->text().isEmpty() ||
+        ui.vatAmount->text().isEmpty())
+        return;
+
     double amount = ui.amount->text().toDouble();
     double vatAmount = ui.vatAmount->text().toDouble();
+
+    if (amount == 0.0 || vatAmount == 0.0)
+        return;
 
     int vat = qRound(100.0 * vatAmount / amount);
 
