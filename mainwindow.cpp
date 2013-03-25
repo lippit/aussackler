@@ -127,7 +127,10 @@ void ASMainWindow::on_actionAddEntries_activated()
 {
     createEntryWindow();
 
-    while(entryWindow->exec());
+    while(entryWindow->exec())
+    {
+        ui.mainTable->scrollToBottom();
+    }
 }
 
 void ASMainWindow::on_actionNewEntry_activated()

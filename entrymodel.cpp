@@ -21,6 +21,7 @@
 #include <QFont>
 #include "entrymodel.h"
 #include "entry.h"
+#include "invest.h"
 
 EntryModel::EntryModel(ASTransactionList * transactions, QObject * parent) :
     QAbstractTableModel(parent),
@@ -53,7 +54,7 @@ int EntryModel::columnCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return 9;
+    return 10;
 }
 
 QVariant EntryModel::data(const QModelIndex& index, int role) const
@@ -97,14 +98,16 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
         case 3:
             return tr("Ust. Betrag");
         case 4:
-            return tr("Betr. Anteil");
+            return tr("Betrag Brutto");
         case 5:
-            return tr("Konto");
+            return tr("Betr. Anteil");
         case 6:
-            return tr("Kategorie");
+            return tr("Konto");
         case 7:
-            return tr("Beleg");
+            return tr("Kategorie");
         case 8:
+            return tr("Beleg");
+        case 9:
             return tr("Belegdatum");
         default:
             return QVariant();
@@ -124,23 +127,36 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
     case 3:
         return e->getVatAmount();
     case 4:
-        return QString::number(e->getChargePercentage()) + " %";
+        return e->getAmount() + e->getVatAmount();
     case 5:
+        return QString::number(e->getChargePercentage()) + " %";
+    case 6:
         if (e->getAccount())
             return e->getAccount()->getDescription();
         else
             return "";
-    case 6:
-        if (e->getCategory())
-            return e->getCategory()->getDescription();
-        else
-            return "";
     case 7:
+        if (e->getCategory())
+        {
+            return e->getCategory()->getDescription();
+        }
+        else
+        {
+            if (dynamic_cast<ASInvestEntry*>(e))
+            {
+                return tr("(Investition)");
+            }
+            else
+            {
+                return "";
+            }
+        }
+    case 8:
         if (e->getDocument())
             return e->getDocument()->getLatest()->getDescription();
         else
             return "";
-    case 8:
+    case 9:
         if (e->getDocument())
         {
             const ASDocument * d =

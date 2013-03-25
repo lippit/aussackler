@@ -69,6 +69,7 @@ private:
     QCompleter * m_entryCompleter;
     QCompleter * m_docCompleter;
 
+    void setEntryType();
     void calculateVat();
     void setVatPercentage();
     void calculateTotal();

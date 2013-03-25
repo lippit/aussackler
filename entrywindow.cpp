@@ -8,7 +8,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Aussackler is distributed in the hope that it will be useful,
+ * Aussackler is distributed in the hope that it will 
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -46,7 +46,6 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
     // Completers
 
     QStringList entryList;
-    QStringList documentList;
 
     ASTransactionList::const_iterator it = transactions->constBegin();
     for (; it != transactions->constEnd(); ++it)
@@ -55,21 +54,17 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
         {
             entryList.append((*it)->getDescription());
         }
-        else if (dynamic_cast<ASDocument*>(*it))
-        {
-            documentList.append((*it)->getDescription());
-        }
     }
+    entryList.removeDuplicates();
 
     m_entryCompleter = new QCompleter(entryList, this);
-    m_docCompleter = new QCompleter(documentList, this);
     ui.entryDescription->setCompleter(m_entryCompleter);
-    ui.documentDescription->setCompleter(m_docCompleter);
 
     // VAT Entries
 
     ui.vatPercentage->addItem("20 %", 20);
     ui.vatPercentage->addItem("10 %", 10);
+    ui.vatPercentage->addItem("0 %", 0);
     ui.vatPercentage->addItem("Anderer", -1);
 }
 
@@ -153,14 +148,21 @@ void ASEntryWindow::on_entryDescription_textChanged()
             fillFields(e);
             ui.transactionDate->setDate(e->getDate().addMonths(1));
 
-            if (e->getDocument() && e->getDocument()->getRecurring())
+           const  ASDocument * doc = e->getDocument();
+
+            if (doc && doc->getRecurring())
             {
-                m_selectedDocument = e->getDocument();
+                m_selectedDocument = doc;
                 documentSetup();
             }
             else
             {
                 documentReset();
+                if (doc)
+                {
+                    ui.documentDate->setDate(
+                        doc->getDocumentDate().addMonths(1));
+                }
             }
             return;
         }
@@ -171,19 +173,7 @@ void ASEntryWindow::on_entryDescription_textChanged()
 
 void ASEntryWindow::on_amount_textEdited()
 {
-    if (!ui.invest->isChecked())
-    {
-        double val = ui.amount->text().toDouble();
-        if (val < 0.0)
-        {
-            ui.expense->setChecked(true);
-        }
-        else if (val > 0.0)
-        {
-            ui.income->setChecked(true);
-        }
-    }
-
+    setEntryType();
     calculateVat();
     setVatPercentage();
     calculateTotal();
@@ -218,6 +208,7 @@ void ASEntryWindow::on_totalAmount_textEdited()
         double vatAmount = totalAmount - amount;
         ui.vatAmount->setText(QString::number(vatAmount));
     }
+    setEntryType();
     setVatPercentage();
 }
 
@@ -279,8 +270,11 @@ void ASEntryWindow::on_buttonBox_accepted()
     if (slm)
     {
         QStringList sl = slm->stringList();
-        sl.append(ui.entryDescription->text());
-        slm->setStringList(sl);
+        if (!sl.contains(ui.entryDescription->text()))
+        {
+            sl.append(ui.entryDescription->text());
+            slm->setStringList(sl);
+        }
     }
 
     documentReset();
@@ -288,6 +282,7 @@ void ASEntryWindow::on_buttonBox_accepted()
     ui.amount->setText("");
     ui.vatAmount->setText("");
     ui.totalAmount->setText("");
+    ui.chargePercentage->setValue(100);
     ui.documentRecurring->setChecked(false);
     ui.amount->setModified(false);
     ui.vatAmount->setModified(false);
@@ -356,6 +351,8 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
     ui.transactionDate->setDate(ae->getDate());
     ui.amount->setText(QString::number(ae->getAmount()));
     ui.vatAmount->setText(QString::number(ae->getVatAmount()));
+    ui.chargePercentage->setValue(ae->getChargePercentage());
+    setEntryType();
     setVatPercentage();
     calculateTotal();
 }
@@ -411,14 +408,34 @@ void ASEntryWindow::documentReset()
     m_selectedDocument = NULL;
     m_override = NULL;
 
+    ui.documentNumber->setText("");
+    ui.documentId->setText("");
     ui.documentDescription->setEnabled(true);
     ui.documentDate->setEnabled(true);
     ui.documentNumber->setEnabled(true);
     ui.documentId->setEnabled(true);
     ui.documentRecurring->setEnabled(true);
-
+    ui.documentDescription->setModified(false);
+    ui.documentNumber->setModified(false);
+    ui.documentId->setModified(false);
     ui.documentRecurring->setChecked(false);
     ui.chooseDocument->setChecked(false);
+}
+
+void ASEntryWindow::setEntryType()
+{
+    if (!ui.invest->isChecked())
+    {
+        double val = ui.amount->text().toDouble();
+        if (val < 0.0)
+        {
+            ui.expense->setChecked(true);
+        }
+        else if (val > 0.0)
+        {
+            ui.income->setChecked(true);
+        }
+    }
 }
 
 void ASEntryWindow::calculateVat()
@@ -437,14 +454,10 @@ void ASEntryWindow::calculateVat()
 
 void ASEntryWindow::setVatPercentage()
 {
-    if (ui.amount->text().isEmpty() ||
-        ui.vatAmount->text().isEmpty())
-        return;
-
     double amount = ui.amount->text().toDouble();
     double vatAmount = ui.vatAmount->text().toDouble();
 
-    if (amount == 0.0 || vatAmount == 0.0)
+    if (amount == 0.0)
         return;
 
     int vat = qRound(100.0 * vatAmount / amount);

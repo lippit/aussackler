@@ -395,12 +395,14 @@
   <tabstop>transactionDate</tabstop>
   <tabstop>amount</tabstop>
   <tabstop>vatAmount</tabstop>
+  <tabstop>totalAmount</tabstop>
   <tabstop>vatPercentage</tabstop>
   <tabstop>chargePercentage</tabstop>
   <tabstop>documentDescription</tabstop>
   <tabstop>documentDate</tabstop>
   <tabstop>documentNumber</tabstop>
   <tabstop>documentId</tabstop>
+  <tabstop>documentRecurring</tabstop>
   <tabstop>chooseDocument</tabstop>
   <tabstop>depreciationPeriod</tabstop>
   <tabstop>buttonBox</tabstop>
