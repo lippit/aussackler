@@ -130,6 +130,7 @@ void ASTransaction::writeToXml(QDomDocument * doc, QDomElement * de)
 {
     de->setAttribute("type", TransactionTypeStrings[getType()]);
     de->setAttribute("uuid", getUuid());
+    de->setAttribute("timestamp", getCreationTimestamp().toString());
     if (getOverride())
     {
         de->setAttribute("overrides", getOverride()->getUuid());
@@ -146,6 +147,8 @@ void ASTransaction::writeToXml(QDomDocument * doc, QDomElement * de)
 void ASTransaction::readFromXml(QDomElement * de)
 {
     m_uuid = de->attribute("uuid");
+    m_creationTimestamp =
+        QDateTime::fromString(de->attribute("timestamp"));
     if (de->hasAttribute("overrides"))
     {
         QUuid overrides = de->attribute("overrides");
