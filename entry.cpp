@@ -102,7 +102,6 @@ ASAccountEntry::ASAccountEntry(ASTransactionList * transactions,
     m_amount(0.0),
     m_vatAmount(0.0),
     m_chargePercentage(100.0),
-    m_vatPercentage(0.0),
     m_account(NULL),
     m_category(NULL),
     m_document(NULL)
@@ -148,17 +147,14 @@ double ASAccountEntry::getChargePercentage() const
     return m_chargePercentage;
 }
 
-bool ASAccountEntry::setVatPercentage(int vatPercentage)
-{
-    CHECK_COMMITED;
-
-    m_vatPercentage = vatPercentage;
-    return true;
-}
-
 int ASAccountEntry::getVatPercentage() const
 {
-    return m_vatPercentage;
+    if (getAmount() == 0.0 || getVatAmount() == 0.0)
+        return -1;
+
+    double vp = 100.0 * (getVatAmount() / getAmount());
+
+    return qRound(vp);
 }
 
 bool ASAccountEntry::setAccount(ASAccount * account)
@@ -227,7 +223,6 @@ ASAccountEntry ASAccountEntry::copy()
     ASAccountEntry e(m_transactions);
 
     e.m_amount = m_amount;
-    e.m_vatPercentage = m_vatPercentage;
     e.m_chargePercentage = m_chargePercentage;
     e.m_account = m_account;
     e.m_category = m_category;
@@ -258,13 +253,6 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
     {
         QDomElement e = doc->createElement("chargepercentage");
         QDomText t = doc->createTextNode(QString::number(getChargePercentage()));
-        e.appendChild(t);
-        de->appendChild(e);
-    }
-    if (getVatPercentage() != 0)
-    {
-        QDomElement e = doc->createElement("vatpercentage");
-        QDomText t = doc->createTextNode(QString::number(getVatPercentage()));
         e.appendChild(t);
         de->appendChild(e);
     }
@@ -312,10 +300,6 @@ void ASAccountEntry::handleDomElement(QDomElement * de)
     else if (n == "chargepercentage")
     {
         setChargePercentage(de->text().toDouble());
-    }
-    else if (n == "vatpercentage")
-    {
-        setVatPercentage(de->text().toInt());
     }
     else if (n == "account")
     {

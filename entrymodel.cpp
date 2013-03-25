@@ -53,7 +53,7 @@ int EntryModel::columnCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return 10;
+    return 9;
 }
 
 QVariant EntryModel::data(const QModelIndex& index, int role) const
@@ -97,16 +97,14 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
         case 3:
             return tr("Ust. Betrag");
         case 4:
-            return tr("Ust. Steuersatz");
-        case 5:
             return tr("Betr. Anteil");
-        case 6:
+        case 5:
             return tr("Konto");
-        case 7:
+        case 6:
             return tr("Kategorie");
-        case 8:
+        case 7:
             return tr("Beleg");
-        case 9:
+        case 8:
             return tr("Belegdatum");
         default:
             return QVariant();
@@ -126,39 +124,23 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
     case 3:
         return e->getVatAmount();
     case 4:
-        if (e->getVatPercentage() >= 0.0)
-        {
-            return QString::number(e->getVatPercentage()) + " %";
-        }
-        else
-        {
-            if (e->getVatAmount() == 0.0)
-            {
-                return tr("Keiner");
-            }
-            else
-            {
-                return "Unbekannt";
-            }
-        }
-    case 5:
         return QString::number(e->getChargePercentage()) + " %";
-    case 6:
+    case 5:
         if (e->getAccount())
             return e->getAccount()->getDescription();
         else
             return "";
-    case 7:
+    case 6:
         if (e->getCategory())
             return e->getCategory()->getDescription();
         else
             return "";
-    case 8:
+    case 7:
         if (e->getDocument())
             return e->getDocument()->getLatest()->getDescription();
         else
             return "";
-    case 9:
+    case 8:
         if (e->getDocument())
         {
             const ASDocument * d =

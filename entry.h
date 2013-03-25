@@ -78,7 +78,6 @@ public:
     double getVatAmount() const;
     bool setChargePercentage(double chargePercentage);
     double getChargePercentage() const;
-    bool setVatPercentage(int vatPercentage);
     int getVatPercentage() const;
     bool setAccount(ASAccount * account);
     ASAccount * getAccount() const;
@@ -102,7 +101,6 @@ protected:
     double m_amount;
     double m_vatAmount;
     double m_chargePercentage;
-    int m_vatPercentage;
     ASAccount * m_account;
     ASCategory * m_category;
     ASDocument * m_document;

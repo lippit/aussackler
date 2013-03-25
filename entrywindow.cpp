@@ -240,9 +240,6 @@ void ASEntryWindow::on_buttonBox_accepted()
     e->setAmount(ui.amount->text().toDouble());
     e->setVatAmount(ui.vatAmount->text().toDouble());
     e->setChargePercentage(ui.chargePercentage->value());
-    e->setVatPercentage(
-        ui.vatPercentage->itemData(
-            ui.vatPercentage->currentIndex()).value<int>());
     e->setAccount((ASAccount*)ui.account->itemData(
                       ui.account->currentIndex()).value<void *>());
     e->setDate(ui.transactionDate->date());
@@ -336,16 +333,8 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
     ui.transactionDate->setDate(ae->getDate());
     ui.amount->setText(QString::number(ae->getAmount()));
     ui.vatAmount->setText(QString::number(ae->getVatAmount()));
-    for (int i=0; i<ui.vatPercentage->count(); ++i)
-    {
-        if(ae->getVatPercentage() ==
-           ui.vatPercentage->itemData(i).value<int>())
-        {
-            ui.vatPercentage->setCurrentIndex(i);
-            break;
-        }
-    }
-    ui.chargePercentage->setValue(ae->getChargePercentage());
+    setVatPercentage();
+    calculateTotal();
 }
 
 void ASEntryWindow::chooseDocument(bool buttonOn)
