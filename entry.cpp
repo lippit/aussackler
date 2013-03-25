@@ -157,7 +157,7 @@ int ASAccountEntry::getVatPercentage() const
     return qRound(vp);
 }
 
-bool ASAccountEntry::setAccount(ASAccount * account)
+bool ASAccountEntry::setAccount(const ASAccount * account)
 {
     CHECK_COMMITED;
     CHECK_NOT_COMMITED(account);
@@ -166,12 +166,12 @@ bool ASAccountEntry::setAccount(ASAccount * account)
     return true;
 }
 
-ASAccount * ASAccountEntry::getAccount() const
+const ASAccount * ASAccountEntry::getAccount() const
 {
     return m_account;
 }
 
-bool ASAccountEntry::setCategory(ASCategory * category)
+bool ASAccountEntry::setCategory(const ASCategory * category)
 {
     CHECK_COMMITED;
     CHECK_NOT_COMMITED(category);
@@ -185,7 +185,7 @@ const ASCategory * ASAccountEntry::getCategory() const
     return m_category;
 }
 
-bool ASAccountEntry::setDocument(ASDocument * document)
+bool ASAccountEntry::setDocument(const ASDocument * document)
 {
     CHECK_COMMITED;
     CHECK_NOT_COMMITED(document);

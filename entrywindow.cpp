@@ -71,9 +71,6 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
     ui.vatPercentage->addItem("20 %", 20);
     ui.vatPercentage->addItem("10 %", 10);
     ui.vatPercentage->addItem("Anderer", -1);
-
-    connect(ui.chooseDocument, SIGNAL(toggled(bool)),
-            this, SLOT(chooseDocument(bool)));
 }
 
 void ASEntryWindow::populateLists()
@@ -155,9 +152,21 @@ void ASEntryWindow::on_entryDescription_textChanged()
         {
             fillFields(e);
             ui.transactionDate->setDate(e->getDate().addMonths(1));
-            break;
+
+            if (e->getDocument() && e->getDocument()->getRecurring())
+            {
+                m_selectedDocument = e->getDocument();
+                documentSetup();
+            }
+            else
+            {
+                documentReset();
+            }
+            return;
         }
     } while(it != m_transactions->constBegin() && ++i < 1000);
+
+    documentReset();
 }
 
 void ASEntryWindow::on_amount_textEdited()
@@ -256,6 +265,7 @@ void ASEntryWindow::on_buttonBox_accepted()
         d->setDocumentDate(ui.documentDate->date());
         d->setNumber(ui.documentNumber->text());
         d->setId(ui.documentId->text());
+        d->setRecurring(ui.documentRecurring->isChecked());
 
         d->commit();
 
@@ -278,10 +288,23 @@ void ASEntryWindow::on_buttonBox_accepted()
     ui.amount->setText("");
     ui.vatAmount->setText("");
     ui.totalAmount->setText("");
+    ui.documentRecurring->setChecked(false);
     ui.amount->setModified(false);
     ui.vatAmount->setModified(false);
     ui.totalAmount->setModified(false);
     ui.entryDescription->setFocus();
+}
+
+void ASEntryWindow::on_chooseDocument_clicked()
+{
+    if (ui.chooseDocument->isChecked() && m_docDialog->exec())
+    {
+        documentSelected();
+    }
+    else
+    {
+        documentReset();
+    }
 }
 
 void ASEntryWindow::setOverride(ASTransaction * override)
@@ -337,26 +360,6 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
     calculateTotal();
 }
 
-void ASEntryWindow::chooseDocument(bool buttonOn)
-{
-    if (buttonOn)
-    {
-        connect(m_docDialog, SIGNAL(accepted()),
-                this, SLOT(documentSelected()));
-        connect(m_docDialog, SIGNAL(rejected()),
-                this, SLOT(documentReset()));
-        m_docDialog->exec();
-        disconnect(m_docDialog, SIGNAL(accepted()),
-                   this, SLOT(documentSelected()));
-        disconnect(m_docDialog, SIGNAL(rejected()),
-                   this, SLOT(documentReset()));
-    }
-    else
-    {
-        documentReset();
-    }
-}
-
 void ASEntryWindow::documentSelected()
 {
     QItemSelectionModel * sm = m_docUi->tableView->selectionModel();
@@ -390,13 +393,16 @@ void ASEntryWindow::documentSetup()
         ui.documentDate->setDate(m_selectedDocument->getDocumentDate());
         ui.documentNumber->setText(m_selectedDocument->getNumber());
         ui.documentId->setText(m_selectedDocument->getId());
+        ui.documentRecurring->setChecked(m_selectedDocument->getRecurring());
         ui.documentDescription->setEnabled(false);
         ui.documentDate->setEnabled(false);
         ui.documentNumber->setEnabled(false);
         ui.documentId->setEnabled(false);
+        ui.documentRecurring->setEnabled(false);
         ui.documentDescription->setModified(false);
         ui.documentNumber->setModified(false);
         ui.documentId->setModified(false);
+        ui.chooseDocument->setChecked(true);
     }
 }
 
@@ -409,7 +415,9 @@ void ASEntryWindow::documentReset()
     ui.documentDate->setEnabled(true);
     ui.documentNumber->setEnabled(true);
     ui.documentId->setEnabled(true);
+    ui.documentRecurring->setEnabled(true);
 
+    ui.documentRecurring->setChecked(false);
     ui.chooseDocument->setChecked(false);
 }
 

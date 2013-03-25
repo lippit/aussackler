@@ -21,7 +21,8 @@
 
 ASDocument::ASDocument(ASTransactionList * transactions,
                        ASTransaction * overrides) :
-    ASTransaction(transactions, overrides)
+    ASTransaction(transactions, overrides),
+    m_recurring(false)
 {
 }
 
@@ -64,6 +65,19 @@ const QString ASDocument::getId() const
     return m_id;
 }
 
+bool ASDocument::setRecurring(bool recurring)
+{
+    CHECK_COMMITED;
+
+    m_recurring = recurring;
+    return true;
+}
+
+bool ASDocument::getRecurring() const
+{
+    return m_recurring;
+}
+
 void ASDocument::writeToXml(QDomDocument * doc, QDomElement * de)
 {
     ASTransaction::writeToXml(doc, de);
@@ -89,6 +103,11 @@ void ASDocument::writeToXml(QDomDocument * doc, QDomElement * de)
         e.appendChild(t);
         de->appendChild(e);
     }
+    if (getRecurring())
+    {
+        QDomElement e = doc->createElement("recurring");
+        de->appendChild(e);
+    }
 }
 
 void ASDocument::handleDomElement(QDomElement * de)
@@ -103,6 +122,10 @@ void ASDocument::handleDomElement(QDomElement * de)
     } else if (n == "id")
     {
         setId(de->text());
+    }
+    else if (n == "recurring")
+    {
+        setRecurring(true);
     }
     else
     {

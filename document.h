@@ -43,6 +43,8 @@ public:
     const QString getNumber() const;
     bool setId(const QString& id);
     const QString getId() const;
+    bool setRecurring(bool recurring);
+    bool getRecurring() const;
 
     virtual TransactionType getType() {return TRANSACTION_TYPE_DOCUMENT;}
     virtual void writeToXml(QDomDocument * doc,
@@ -52,6 +54,7 @@ protected:
     QDate m_date;
     QString m_number;
     QString m_id;
+    bool m_recurring;
 
     virtual void handleDomElement(QDomElement * de);
 };

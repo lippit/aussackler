@@ -56,9 +56,9 @@ ASTransaction::ASTransaction(ASTransactionList * transactions,
         m_uuid = QUuid::createUuid();
         m_creationTimestamp = QDateTime::currentDateTime();
         m_overrides = overrides;
-        if (m_overrides)
+        if (overrides)
         {
-            m_overrides->m_overwrittenBy = this;
+            overrides->m_overwrittenBy = this;
         }
     }
 }

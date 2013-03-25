@@ -79,11 +79,11 @@ public:
     bool setChargePercentage(double chargePercentage);
     double getChargePercentage() const;
     int getVatPercentage() const;
-    bool setAccount(ASAccount * account);
-    ASAccount * getAccount() const;
-    bool setCategory(ASCategory * category);
+    bool setAccount(const ASAccount * account);
+    const ASAccount * getAccount() const;
+    bool setCategory(const ASCategory * category);
     const ASCategory * getCategory() const;
-    bool setDocument(ASDocument * document);
+    bool setDocument(const ASDocument * document);
     const ASDocument * getDocument() const;
     bool setDate(const QDate& date);
     const QDate getDate() const;
@@ -101,9 +101,9 @@ protected:
     double m_amount;
     double m_vatAmount;
     double m_chargePercentage;
-    ASAccount * m_account;
-    ASCategory * m_category;
-    ASDocument * m_document;
+    const ASAccount * m_account;
+    const ASCategory * m_category;
+    const ASDocument * m_document;
     QDate m_date;
 
     virtual void handleDomElement(QDomElement * de);

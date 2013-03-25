@@ -51,8 +51,8 @@ private slots:
     void on_totalAmount_textEdited();
     void on_vatPercentage_currentIndexChanged(int index);
     void on_buttonBox_accepted();
+    void on_chooseDocument_clicked();
 
-    void chooseDocument(bool buttonOn);
     void documentSelected();
     void documentSetup();
     void documentReset();
@@ -64,7 +64,7 @@ private:
     ASTransactionList * m_transactions;
     Ui::DocumentsWindow * m_docUi;
     QDialog * m_docDialog;
-    ASDocument * m_selectedDocument;
+    const ASDocument * m_selectedDocument;
     ASTransaction * m_override;
     QCompleter * m_entryCompleter;
     QCompleter * m_docCompleter;

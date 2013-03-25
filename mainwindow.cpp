@@ -206,6 +206,7 @@ void ASMainWindow::on_actionCorrectDocument_activated()
                 editDocUi.date->setDate(m_docOverride->getDocumentDate());
                 editDocUi.documentNumber->setText(m_docOverride->getNumber());
                 editDocUi.documentId->setText(m_docOverride->getId());
+                editDocUi.recurring->setChecked(m_docOverride->getRecurring());
                 editDocUi.description->setFocus();
                 editDocDialog->show();
             }
