@@ -46,7 +46,14 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QTableView" name="earningsTable"/>
+         <widget class="QTextEdit" name="summary">
+          <property name="font">
+           <font>
+            <family>Liberation Mono</family>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -60,10 +67,22 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_4">
+      <widget class="QWidget" name="tab_5">
        <attribute name="title">
-        <string>Zusammenfassung</string>
+        <string>Umsatzsteuer</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QTextEdit" name="vat">
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -91,6 +110,8 @@
     <addaction name="actionCorrectDocument"/>
     <addaction name="actionNewAccount"/>
     <addaction name="actionNewCategory"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuDatei">
     <property name="title">
@@ -193,6 +214,11 @@
   <action name="actionCorrectDocument">
    <property name="text">
     <string>Beleg korrigieren</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Einstellungen</string>
    </property>
   </action>
  </widget>

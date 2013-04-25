@@ -48,8 +48,8 @@ double ASInvestEntry::getDepreciation(int year) const
         return 0.0;
 
     int hy = m_date.month() <= 6 ? 0 : 1;
-    double am = m_amount;
-    double dphy = m_amount / (m_years * 2);
+    double am = qAbs(m_amount);
+    double dphy = am / (m_years * 2);
     double d = 0.0;
     while(am > 0)
     {
@@ -61,7 +61,7 @@ double ASInvestEntry::getDepreciation(int year) const
         hy++;
     }
 
-    return d;
+    return -d;
 }
 
 void ASInvestEntry::writeToXml(QDomDocument * doc, QDomElement * de)

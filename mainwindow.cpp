@@ -31,9 +31,12 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
     accountDialog(NULL),
     editDocDialog(NULL),
     categoryDialog(NULL),
+    settingsDialog(NULL),
     m_transactions(transactions),
     m_entryModel(NULL),
     m_docModel(NULL),
+    m_calc(NULL),
+    m_assets(NULL),
     m_docOverride(NULL),
     m_populate(true)
 {
@@ -90,7 +93,6 @@ void ASMainWindow::on_actionNew_activated()
     // Model setup
 
     ui.mainTable->setModel(NULL);
-    ui.earningsTable->setModel(NULL);
     ui.investTable->setModel(NULL);
 
     delete m_entryModel;
@@ -100,6 +102,9 @@ void ASMainWindow::on_actionNew_activated()
 
     m_entryModel = new EntryModel(m_transactions);
     m_docModel = new DocModel(m_transactions);
+    m_calc = new ASCalc(m_transactions);
+    m_assets = new ASAssets(m_transactions);
+    m_vat = new ASVat(m_transactions);
 
     ui.mainTable->setModel(m_entryModel);
     docUi.tableView->setModel(m_docModel);
@@ -268,6 +273,29 @@ void ASMainWindow::on_actionNewCategory_activated()
     categoryDialog->show();
 }
 
+void ASMainWindow::on_actionSettings_activated()
+{
+    if (!settingsDialog)
+    {
+        settingsDialog = new QDialog(this);
+        settingsUi.setupUi(settingsDialog);
+        settingsUi.categories->clear();
+        ASTransactionList::const_iterator it = m_transactions->constBegin();
+        for(; it != m_transactions->constEnd(); ++it)
+        {
+            ASCategory * c = dynamic_cast<ASCategory*>(*it);
+            if (c)
+            {
+                settingsUi.categories->addItem(c->getDescription(),
+                                               QVariant::fromValue((void*)c));
+                settingsUi.categories2->addItem(c->getDescription(),
+                                                QVariant::fromValue((void*)c));
+            }
+        }
+    }
+    settingsDialog->show();
+}
+
 void ASMainWindow::on_actionSave_activated()
 {
     if (m_currentFileName.isEmpty())
@@ -382,6 +410,39 @@ void ASMainWindow::on_actionLoad_activated()
 void ASMainWindow::on_actionQuit_activated()
 {
     close();
+}
+
+void ASMainWindow::on_tabWidget_currentChanged(int index)
+{
+    int year;
+    if (settingsDialog && !settingsUi.year->text().isEmpty())
+    {
+        year = settingsUi.year->text().toInt();
+    }
+    else
+    {
+        year = QDate::currentDate().year();
+    }
+
+    switch(index)
+    {
+    case 1:
+        ui.summary->setText(
+            m_calc->getCalculation(year, (ASCategory*)settingsUi.categories->itemData(
+                                       settingsUi.categories->currentIndex()).
+                                   value<void *>()));
+        break;
+    case 2:
+        m_assets->updateAssetsList();
+        break;
+    case 3:
+        m_vat->updateCalculation(year, (ASCategory*)settingsUi.categories2->itemData(
+                                     settingsUi.categories2->currentIndex()).
+                                 value<void *>());
+        break;
+    default:
+        break;
+    }
 }
 
 void ASMainWindow::createAccount()
