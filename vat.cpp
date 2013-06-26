@@ -57,9 +57,9 @@ void ASVat::updateCalculation(int year, ASCategory * calcCategory)
             vatPaid -= ae->getVatAmount();
         }
 
-        if (ae->getVatAmount() == 0)
+        if (ae->getVatAmount() == 0 && ae->getAmount() < 0.0)
         {
-            qDebug("%s - %f", ae->getDescription().toUtf8().constData(), ae->getAmount());
+            qDebug("%s; %f", ae->getDescription().toUtf8().constData(), ae->getAmount());
         }
     }
 
