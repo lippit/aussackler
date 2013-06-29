@@ -51,7 +51,7 @@ double ASInvestEntry::getDepreciation(int year) const
     double am = qAbs(m_amount);
     double dphy = am / (m_years * 2);
     double d = 0.0;
-    while(am > 0)
+    while(am > 0.01)
     {
         if (year == m_date.year() + hy / 2)
         {
