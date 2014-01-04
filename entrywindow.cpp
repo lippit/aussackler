@@ -59,19 +59,13 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
 
     m_entryCompleter = new QCompleter(entryList, this);
     ui.entryDescription->setCompleter(m_entryCompleter);
-
-    // VAT Entries
-
-    ui.vatPercentage->addItem("20 %", 20);
-    ui.vatPercentage->addItem("10 %", 10);
-    ui.vatPercentage->addItem("0 %", 0);
-    ui.vatPercentage->addItem("Anderer", -1);
 }
 
 void ASEntryWindow::populateLists()
 {
     ui.account->clear();
     ui.category->clear();
+    ui.vatCategory->clear();
 
     ASTransactionList::const_iterator it = m_transactions->constBegin();
     for (; it != m_transactions->constEnd(); ++it)
@@ -87,6 +81,12 @@ void ASEntryWindow::populateLists()
         {
             ui.category->addItem(c->getDescription(),
                                  QVariant::fromValue((void*)c));
+        }
+        ASVatCategory * v = dynamic_cast<ASVatCategory*>(*it);
+        if (v)
+        {
+            ui.vatCategory->addItem(v->getDescription(),
+                                    QVariant::fromValue((void*)v));
         }
     }
 }
@@ -191,8 +191,9 @@ void ASEntryWindow::on_totalAmount_textEdited()
 
     if (!ui.amount->isModified())
     {
-        double vp = ui.vatPercentage->itemData(
-            ui.vatPercentage->currentIndex()).value<int>();
+        double vp = ((ASVatCategory*)ui.vatCategory->itemData(
+                         ui.vatCategory->currentIndex()).value<void *>())
+            ->getVatPercentage();
         if (vp > 0.0)
         {
             double amount = qRound(100.0 * totalAmount /
@@ -212,7 +213,7 @@ void ASEntryWindow::on_totalAmount_textEdited()
     setVatPercentage();
 }
 
-void ASEntryWindow::on_vatPercentage_currentIndexChanged(int index)
+void ASEntryWindow::on_vatCategory_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
     calculateVat();
@@ -234,11 +235,14 @@ void ASEntryWindow::on_buttonBox_accepted()
         e = new ASAccountEntry(m_transactions, m_override);
         e->setCategory((ASCategory*)ui.category->itemData(
                            ui.category->currentIndex()).value<void *>());
+        e->setVatCategory((ASVatCategory*)ui.vatCategory->itemData(
+                              ui.vatCategory->currentIndex()).value<void *>());
     }
 
     e->setDescription(ui.entryDescription->text());
     e->setAmount(ui.amount->text().toDouble());
     e->setVatAmount(ui.vatAmount->text().toDouble());
+    e->setVatTaxableBase(ui.vatTaxableBase->isChecked());
     e->setChargePercentage(ui.chargePercentage->value());
     e->setAccount((ASAccount*)ui.account->itemData(
                       ui.account->currentIndex()).value<void *>());
@@ -442,12 +446,14 @@ void ASEntryWindow::calculateVat()
 {
     if (!ui.amount->text().isEmpty())
     {
-        double vp = ui.vatPercentage->itemData(
-            ui.vatPercentage->currentIndex()).value<int>();
+        double vp = ((ASVatCategory*)ui.vatCategory->itemData(
+                         ui.vatCategory->currentIndex()).value<void *>())
+            ->getVatPercentage();
         if (vp >= 0)
         {
             double vat = qRound(vp * ui.amount->text().toDouble()) / 100.0;
             ui.vatAmount->setText(QString::number(vat));
+            ui.vatTaxableBase->setChecked(vat > 0.0);
         }
     }
 }
@@ -460,17 +466,19 @@ void ASEntryWindow::setVatPercentage()
     if (amount == 0.0)
         return;
 
-    int vat = qRound(100.0 * vatAmount / amount);
+    double vat = 100.0 * vatAmount / amount;
 
-    for (int i=0; i<ui.vatPercentage->count(); ++i)
+    for (int i=0; i<ui.vatCategory->count(); ++i)
     {
-        if(vat == ui.vatPercentage->itemData(i).value<int>())
+        double vp = ((ASVatCategory*)ui.vatCategory->itemData(i).value<void *>())
+            ->getVatPercentage();
+        if(qAbs(vp - vat) < 0.1)
         {
-            ui.vatPercentage->setCurrentIndex(i);
+            ui.vatCategory->setCurrentIndex(i);
             return;
         }
     }
-    ui.vatPercentage->setCurrentIndex(ui.vatPercentage->count()-1);
+    ui.vatCategory->setCurrentIndex(ui.vatCategory->count()-1);
 }
 
 void ASEntryWindow::calculateTotal()

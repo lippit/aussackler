@@ -110,6 +110,7 @@
     <addaction name="actionCorrectDocument"/>
     <addaction name="actionNewAccount"/>
     <addaction name="actionNewCategory"/>
+    <addaction name="actionNewVatCategory"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
    </widget>
@@ -219,6 +220,14 @@
   <action name="actionSettings">
    <property name="text">
     <string>Einstellungen</string>
+   </property>
+  </action>
+  <action name="actionNewVatCategory">
+   <property name="text">
+    <string>Neue Ust. Kategorie</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
    </property>
   </action>
  </widget>

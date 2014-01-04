@@ -7,7 +7,7 @@ CONFIG += debug
 
 # Input
 HEADERS += aussackler.h \
-           assets.h \
+           assetsmodel.h \
            calc.h \
            docmodel.h \
            document.h \
@@ -26,10 +26,11 @@ FORMS +=   account.ui \
            document.ui \
            entry.ui \
            mainwindow.ui \
-           settings.ui
+           settings.ui \
+           vatcategory.ui
 
 SOURCES += aussackler.cpp \
-           assets.cpp \
+           assetsmodel.cpp \
            calc.cpp \
            docmodel.cpp \
            document.cpp \

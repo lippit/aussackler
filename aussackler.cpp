@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QTextCodec>
 #include <QDate>
 #include <stdio.h>
 #include "aussackler.h"

@@ -31,12 +31,13 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
     accountDialog(NULL),
     editDocDialog(NULL),
     categoryDialog(NULL),
+    vatCategoryDialog(NULL),
     settingsDialog(NULL),
     m_transactions(transactions),
     m_entryModel(NULL),
     m_docModel(NULL),
+    m_assetsModel(NULL),
     m_calc(NULL),
-    m_assets(NULL),
     m_docOverride(NULL),
     m_populate(true)
 {
@@ -58,8 +59,11 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
 void ASMainWindow::connectModels()
 {
     m_entryModel->transactionsChanged();
+    m_assetsModel->transactionsChanged();
     m_docModel->transactionsChanged();
 
+    connect(m_transactions, SIGNAL(newTransaction()),
+            m_entryModel, SLOT(transactionsChanged()));
     connect(m_transactions, SIGNAL(newTransaction()),
             m_entryModel, SLOT(transactionsChanged()));
     connect(m_transactions, SIGNAL(newTransaction()),
@@ -72,6 +76,11 @@ void ASMainWindow::disconnectModels()
     {
         disconnect(m_transactions, SIGNAL(newTransaction()),
                    m_entryModel, SLOT(transactionsChanged()));
+    }
+    if (m_assetsModel)
+    {
+        disconnect(m_transactions, SIGNAL(newTransaction()),
+                   m_assetsModel, SLOT(transactionsChanged()));
     }
     if (m_docModel)
     {
@@ -97,16 +106,18 @@ void ASMainWindow::on_actionNew_activated()
 
     delete m_entryModel;
     delete m_docModel;
+    delete m_assetsModel;
     //delete m_earningsModel;
     //delete m_investModel;
 
     m_entryModel = new EntryModel(m_transactions);
     m_docModel = new DocModel(m_transactions);
+    m_assetsModel = new AssetsModel(m_transactions);
     m_calc = new ASCalc(m_transactions);
-    m_assets = new ASAssets(m_transactions);
     m_vat = new ASVat(m_transactions);
 
     ui.mainTable->setModel(m_entryModel);
+    ui.investTable->setModel(m_assetsModel);
     docUi.tableView->setModel(m_docModel);
 
     connectModels();
@@ -273,6 +284,36 @@ void ASMainWindow::on_actionNewCategory_activated()
     categoryDialog->show();
 }
 
+void ASMainWindow::on_actionNewVatCategory_activated()
+{
+    if (!vatCategoryDialog)
+    {
+        vatCategoryDialog = new QDialog(this);
+        vatCategoryUi.setupUi(vatCategoryDialog);
+        vatCategoryUi.replaces->addItem("-", 0);
+        connect(vatCategoryDialog, SIGNAL(accepted()),
+                this, SLOT(createVatCategory()));
+    }
+    vatCategoryUi.parent->clear();
+    vatCategoryUi.parent->addItem("-", 0);
+    vatCategoryUi.replaces->clear();
+    vatCategoryUi.replaces->addItem("-", 0);
+    ASTransactionList::const_iterator it = m_transactions->constBegin();
+    for (; it != m_transactions->constEnd(); ++it)
+    {
+        ASVatCategory * c = dynamic_cast<ASVatCategory*>(*it);
+        if (c)
+        {
+            vatCategoryUi.parent->addItem(c->getDescription(),
+                                          QVariant::fromValue((void*)c));
+            vatCategoryUi.replaces->addItem(c->getDescription(),
+                                            QVariant::fromValue((void*)c));
+        }
+    }
+    vatCategoryUi.description->setFocus();
+    vatCategoryDialog->show();
+}
+
 void ASMainWindow::on_actionSettings_activated()
 {
     if (!settingsDialog)
@@ -392,6 +433,9 @@ void ASMainWindow::on_actionLoad_activated()
             case ASTransaction::TRANSACTION_TYPE_DOCUMENT:
                 a = new ASDocument(m_transactions);
                 break;
+            case ASTransaction::TRANSACTION_TYPE_VATCATEGORY:
+                a = new ASVatCategory(m_transactions);
+                break;
             }
             if (a)
             {
@@ -433,7 +477,10 @@ void ASMainWindow::on_tabWidget_currentChanged(int index)
                                    value<void *>()));
         break;
     case 2:
-        m_assets->updateAssetsList();
+        if (m_assetsModel)
+        {
+            m_assetsModel->setYear(year);
+        }
         break;
     case 3:
         m_vat->updateCalculation(year, (ASCategory*)settingsUi.categories2->itemData(
@@ -532,6 +579,46 @@ void ASMainWindow::createCategory()
                                         categoryUi.replaces->currentIndex()).
                                     value<void *>());
     c->setDescription(desc);
+    c->commit();
+
+    m_populate = true;
+}
+
+void ASMainWindow::createVatCategory()
+{
+    QString desc = vatCategoryUi.description->text();
+
+    if (desc.isEmpty())
+    {
+        QMessageBox::critical(this,
+                              tr("Fehler"),
+                              tr("Beschreibung erforderlich!"));
+        return;
+    }
+
+    ASTransactionList::const_iterator it = m_transactions->constBegin();
+    for (; it != m_transactions->constEnd(); ++it)
+    {
+        ASVatCategory * c = dynamic_cast<ASVatCategory*>(*it);
+        if (c && c->getDescription() == desc)
+        {
+            QMessageBox::critical(this,
+                                  tr("Fehler"),
+                                  tr("Beschreibung bereits vorhanden!"));
+            return;
+        }
+    }
+
+    ASVatCategory * c = new ASVatCategory(m_transactions,
+                                          (ASVatCategory*)vatCategoryUi.replaces->itemData(
+                                              vatCategoryUi.replaces->currentIndex()).
+                                          value<void *>());
+
+    c->setDescription(desc);
+    c->setVatPercentage(vatCategoryUi.vatPercentage->value());
+    c->setParent((ASVatCategory*)vatCategoryUi.parent->itemData(
+                     vatCategoryUi.parent->currentIndex()).
+                 value<void *>());
     c->commit();
 
     m_populate = true;

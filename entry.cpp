@@ -96,14 +96,85 @@ ASCategory::ASCategory(ASTransactionList * transactions,
 
 /********************************************************************/
 
+ASVatCategory::ASVatCategory(ASTransactionList * transactions,
+                             ASVatCategory * overrides) :
+    ASTransaction(transactions, overrides),
+    m_parent(NULL),
+    m_vatPercentage(0.0)
+{
+}
+
+bool ASVatCategory::setParent(ASVatCategory * parent)
+{
+    CHECK_COMMITED;
+
+    m_parent = parent;
+    return true;
+}
+
+const ASVatCategory * ASVatCategory::getParent() const
+{
+    return m_parent;
+}
+
+bool ASVatCategory::setVatPercentage(double vatPercentage)
+{
+    CHECK_COMMITED;
+
+    m_vatPercentage = vatPercentage;
+    return true;
+}
+
+double ASVatCategory::getVatPercentage()
+{
+    return m_vatPercentage;
+}
+
+void ASVatCategory::writeToXml(QDomDocument * doc, QDomElement * de)
+{
+    ASTransaction::writeToXml(doc, de);
+    if (getParent())
+    {
+        QDomElement par = doc->createElement("parent");
+        QDomText t = doc->createTextNode(getParent()->getUuid());
+        par.appendChild(t);
+        de->appendChild(par);
+    }
+    QDomElement vap = doc->createElement("percentage");
+    QDomText t = doc->createTextNode(QString::number(getVatPercentage()));
+    vap.appendChild(t);
+    de->appendChild(vap);
+}
+
+void ASVatCategory::handleDomElement(QDomElement * de)
+{
+    if (de->tagName() == "parent")
+    {
+        setParent(dynamic_cast<ASVatCategory *>
+                  (m_transactions->getByUuid(de->text())));
+    }
+    else if (de->tagName() == "percentage")
+    {
+        setVatPercentage(de->text().toDouble());
+    }
+    else
+    {
+        ASTransaction::handleDomElement(de);
+    }
+}
+
+/********************************************************************/
+
 ASAccountEntry::ASAccountEntry(ASTransactionList * transactions,
                                ASTransaction * overrides) :
     ASTransaction(transactions, overrides),
     m_amount(0.0),
     m_vatAmount(0.0),
     m_chargePercentage(100.0),
+    m_vatTaxableBase(false),
     m_account(NULL),
     m_category(NULL),
+    m_vatCategory(NULL),
     m_document(NULL)
 {
 }
@@ -147,6 +218,19 @@ double ASAccountEntry::getChargePercentage() const
     return m_chargePercentage;
 }
 
+bool ASAccountEntry::setVatTaxableBase(bool vatTaxableBase)
+{
+    CHECK_COMMITED;
+
+    m_vatTaxableBase = vatTaxableBase;
+    return true;
+}
+
+bool ASAccountEntry::getVatTaxableBase() const
+{
+    return m_vatTaxableBase;
+}
+
 int ASAccountEntry::getVatPercentage() const
 {
     if (getAmount() == 0.0 || getVatAmount() == 0.0)
@@ -183,6 +267,23 @@ bool ASAccountEntry::setCategory(const ASCategory * category)
 const ASCategory * ASAccountEntry::getCategory() const
 {
     return m_category;
+}
+
+bool ASAccountEntry::setVatCategory(const ASVatCategory * category)
+{
+    if (!category)
+        return false;
+
+    CHECK_COMMITED;
+    CHECK_NOT_COMMITED(category);
+
+    m_vatCategory = category;
+    return true;
+}
+
+const ASVatCategory * ASAccountEntry::getVatCategory() const
+{
+    return m_vatCategory;
 }
 
 bool ASAccountEntry::setDocument(const ASDocument * document)
@@ -256,6 +357,11 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
         e.appendChild(t);
         de->appendChild(e);
     }
+    if (getVatTaxableBase())
+    {
+        QDomElement e = doc->createElement("vattaxablebase");
+        de->appendChild(e); 
+    }
     if (getAccount() != NULL)
     {
         QDomElement e = doc->createElement("account");
@@ -267,6 +373,13 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
     {
         QDomElement e = doc->createElement("category");
         QDomText t = doc->createTextNode(getCategory()->getUuid());
+        e.appendChild(t);
+        de->appendChild(e);
+    }
+    if (getVatCategory() != NULL)
+    {
+        QDomElement e = doc->createElement("vatcategory");
+        QDomText t = doc->createTextNode(getVatCategory()->getUuid());
         e.appendChild(t);
         de->appendChild(e);
     }
@@ -301,6 +414,10 @@ void ASAccountEntry::handleDomElement(QDomElement * de)
     {
         setChargePercentage(de->text().toDouble());
     }
+    else if (n == "vattaxablebase")
+    {
+        setVatTaxableBase(true);
+    }
     else if (n == "account")
     {
         setAccount(dynamic_cast<ASAccount*>
@@ -310,6 +427,11 @@ void ASAccountEntry::handleDomElement(QDomElement * de)
     {
         setCategory(dynamic_cast<ASCategory*>
                     (m_transactions->getByUuid(de->text())));
+    }
+    else if (n == "vatcategory")
+    {
+        setVatCategory(dynamic_cast<ASVatCategory*>
+                       (m_transactions->getByUuid(de->text())));
     }
     else if (n == "document")
     {

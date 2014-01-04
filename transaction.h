@@ -69,7 +69,8 @@ public:
         TRANSACTION_TYPE_ACCOUNT,
         TRANSACTION_TYPE_ACCOUNTENTRY,
         TRANSACTION_TYPE_INVESTMENT,
-        TRANSACTION_TYPE_DOCUMENT
+        TRANSACTION_TYPE_DOCUMENT,
+        TRANSACTION_TYPE_VATCATEGORY
     };
 
     static QStringList TransactionTypeStrings;
@@ -82,6 +83,7 @@ public:
         TransactionTypeStrings << "accountentry";
         TransactionTypeStrings << "investment";
         TransactionTypeStrings << "document";
+        TransactionTypeStrings << "vatcategory";
     };
 
     // Constructors

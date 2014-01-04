@@ -56,10 +56,39 @@ protected:
 class ASCategory : public ASTransaction
 {
 public:
+    // Constructors
+
     ASCategory(ASTransactionList * transactions = NULL,
                ASCategory * overrides = NULL);
 
+    // Public functions
+
     virtual TransactionType getType() {return TRANSACTION_TYPE_CATEGORY;}
+};
+
+class ASVatCategory : public ASTransaction
+{
+public:
+    // Constructors
+
+    ASVatCategory(ASTransactionList * transactions = NULL,
+                  ASVatCategory * overrides = NULL);
+
+    // Public functions
+    bool setParent(ASVatCategory * parent);
+    const ASVatCategory * getParent() const;
+    bool setVatPercentage(double vatPercentage);
+    double getVatPercentage();
+    virtual void writeToXml(QDomDocument * doc,
+                            QDomElement * de);
+
+    virtual TransactionType getType() {return TRANSACTION_TYPE_VATCATEGORY;}
+
+protected:
+    ASVatCategory * m_parent;
+    double m_vatPercentage;
+
+    virtual void handleDomElement(QDomElement * de);
 };
 
 class ASAccountEntry : public ASTransaction
@@ -79,10 +108,14 @@ public:
     bool setChargePercentage(double chargePercentage);
     double getChargePercentage() const;
     int getVatPercentage() const;
+    bool getVatTaxableBase() const;
+    bool setVatTaxableBase(bool vatTaxableBase);
     bool setAccount(const ASAccount * account);
     const ASAccount * getAccount() const;
     bool setCategory(const ASCategory * category);
     const ASCategory * getCategory() const;
+    bool setVatCategory(const ASVatCategory * category);
+    const ASVatCategory * getVatCategory() const;
     bool setDocument(const ASDocument * document);
     const ASDocument * getDocument() const;
     bool setDate(const QDate& date);
@@ -101,8 +134,10 @@ protected:
     double m_amount;
     double m_vatAmount;
     double m_chargePercentage;
+    bool m_vatTaxableBase;
     const ASAccount * m_account;
     const ASCategory * m_category;
+    const ASVatCategory * m_vatCategory;
     const ASDocument * m_document;
     QDate m_date;
 

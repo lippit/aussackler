@@ -26,12 +26,13 @@
 #include "ui_category.h"
 #include "ui_doclist.h"
 #include "ui_settings.h"
+#include "ui_vatcategory.h"
 #include "entrywindow.h"
 #include "transaction.h"
 #include "entrymodel.h"
+#include "assetsmodel.h"
 #include "docmodel.h"
 #include "calc.h"
-#include "assets.h"
 #include "vat.h"
 
 class ASMainWindow : public QMainWindow
@@ -56,6 +57,7 @@ private slots:
     void on_actionCorrectDocument_activated();
     void on_actionNewAccount_activated();
     void on_actionNewCategory_activated();
+    void on_actionNewVatCategory_activated();
     void on_actionSettings_activated();
 
     void on_tabWidget_currentChanged(int index);
@@ -63,6 +65,7 @@ private slots:
     void createAccount();
     void createDocument();
     void createCategory();
+    void createVatCategory();
 
 private:
     QString m_currentFileName;
@@ -70,19 +73,21 @@ private:
     Ui::AccountWindow accountUi;
     Ui::DocumentWindow editDocUi;
     Ui::CategoryWindow categoryUi;
+    Ui::VatCategoryWindow vatCategoryUi;
     Ui::DocumentsWindow docUi;
     Ui::SettingsWindow settingsUi;
     ASEntryWindow * entryWindow;
     QDialog * accountDialog;
     QDialog * editDocDialog;
     QDialog * categoryDialog;
+    QDialog * vatCategoryDialog;
     QDialog * docDialog;
     QDialog * settingsDialog;
     ASTransactionList * m_transactions;
     EntryModel * m_entryModel;
     DocModel * m_docModel;
+    AssetsModel * m_assetsModel;
     ASCalc * m_calc;
-    ASAssets * m_assets;
     ASVat * m_vat;
     ASDocument * m_docOverride;
     QString m_fileFilter;

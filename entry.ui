@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>524</width>
-    <height>685</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,17 +92,27 @@
       <string>Buchung</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Betrag Netto</string>
+      <item row="8" column="1">
+       <widget class="QComboBox" name="vatCategory">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
       <item row="8" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label_16">
         <property name="text">
-         <string>Umsatzsteuersatz</string>
+         <string>Ust. Kategorie</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Betrag Netto</string>
         </property>
        </widget>
       </item>
@@ -123,14 +133,14 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
          <string>Buchungsdatum</string>
         </property>
        </widget>
       </item>
-      <item row="9" column="1">
+      <item row="11" column="1">
        <widget class="QSpinBox" name="chargePercentage">
         <property name="maximumSize">
          <size>
@@ -149,7 +159,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QDateEdit" name="transactionDate">
         <property name="maximumSize">
          <size>
@@ -165,28 +175,28 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
+      <item row="11" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>Betrieblicher Anteil</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="label_15">
         <property name="text">
          <string>Betrag Brutto</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>Ust Betrag</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QLineEdit" name="amount">
         <property name="maximumSize">
          <size>
@@ -199,31 +209,21 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_14">
         <property name="text">
          <string>Beschreibung</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QLineEdit" name="entryDescription">
         <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item row="8" column="1">
-       <widget class="QComboBox" name="vatPercentage">
-        <property name="maximumSize">
-         <size>
-          <width>120</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QLineEdit" name="vatAmount">
         <property name="maximumSize">
          <size>
@@ -233,13 +233,20 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="7" column="1">
        <widget class="QLineEdit" name="totalAmount">
         <property name="maximumSize">
          <size>
           <width>120</width>
           <height>16777215</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QCheckBox" name="vatTaxableBase">
+        <property name="text">
+         <string>Ust. Bemessungsgrundlage</string>
         </property>
        </widget>
       </item>
@@ -396,7 +403,8 @@
   <tabstop>amount</tabstop>
   <tabstop>vatAmount</tabstop>
   <tabstop>totalAmount</tabstop>
-  <tabstop>vatPercentage</tabstop>
+  <tabstop>vatCategory</tabstop>
+  <tabstop>vatTaxableBase</tabstop>
   <tabstop>chargePercentage</tabstop>
   <tabstop>documentDescription</tabstop>
   <tabstop>documentDate</tabstop>
@@ -404,12 +412,12 @@
   <tabstop>documentId</tabstop>
   <tabstop>documentRecurring</tabstop>
   <tabstop>chooseDocument</tabstop>
-  <tabstop>depreciationPeriod</tabstop>
-  <tabstop>buttonBox</tabstop>
   <tabstop>expense</tabstop>
   <tabstop>income</tabstop>
   <tabstop>invest</tabstop>
   <tabstop>account</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>depreciationPeriod</tabstop>
  </tabstops>
  <resources/>
  <connections>

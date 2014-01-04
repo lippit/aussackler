@@ -17,37 +17,33 @@
  * along with Aussackler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
-#include <QFont>
-#include "assets.h"
-#include "entry.h"
+#ifndef ASSETSMODEL_H
+#define ASSETSMODEL_H
+
+#include <QAbstractTableModel>
+#include "tsort.h"
+#include "transaction.h"
 #include "invest.h"
 
-ASAssets::ASAssets(ASTransactionList * transactions, QObject * parent) :
-    QObject(parent),
-    m_transactions(transactions)
+class AssetsModel : public QAbstractTableModel,
+    public ASTransactionSorter<ASInvestEntry*>
 {
-}
+    Q_OBJECT
 
-void ASAssets::updateAssetsList()
-{
-    double total = 0.0;
+public:
+    AssetsModel(ASTransactionList * transactions, QObject * parent = 0);
 
-    ASTransactionList::const_iterator it = m_transactions->constBegin();
-    for (; it != m_transactions->constEnd(); ++it)
-    {
-        const ASInvestEntry * ie = dynamic_cast<const ASInvestEntry*>(*it);
+    virtual int rowCount(const QModelIndex& parent) const;
+    virtual int columnCount(const QModelIndex& parent) const;
+    virtual QVariant data(const QModelIndex& index, int role) const;
 
-        if (!ie)
-            continue;
+    void setYear(int year) {m_year = year;}
 
-        if (ie->getOverwrittenBy())
-            continue;
+public slots:
+    void transactionsChanged();
 
-        total += ie->getDepreciation(2011);
+private:
+    int m_year;
+};
 
-        qDebug("%s %f", ie->getDescription().toUtf8().constData(), ie->getDepreciation(2011));
-    }
-
-    qDebug("Total: %f", total);
-}
+#endif
