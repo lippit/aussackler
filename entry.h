@@ -91,6 +91,8 @@ protected:
     virtual void handleDomElement(QDomElement * de);
 };
 
+typedef QList<const ASVatCategory * > ASVatCategoryList;
+
 class ASAccountEntry : public ASTransaction
 {
 public:
@@ -114,8 +116,8 @@ public:
     const ASAccount * getAccount() const;
     bool setCategory(const ASCategory * category);
     const ASCategory * getCategory() const;
-    bool setVatCategory(const ASVatCategory * category);
-    const ASVatCategory * getVatCategory() const;
+    bool addVatCategory(const ASVatCategory * category);
+    const ASVatCategoryList getVatCategories() const;
     bool setDocument(const ASDocument * document);
     const ASDocument * getDocument() const;
     bool setDate(const QDate& date);
@@ -137,7 +139,7 @@ protected:
     bool m_vatTaxableBase;
     const ASAccount * m_account;
     const ASCategory * m_category;
-    const ASVatCategory * m_vatCategory;
+    ASVatCategoryList m_vatCategories;
     const ASDocument * m_document;
     QDate m_date;
 

@@ -174,7 +174,6 @@ ASAccountEntry::ASAccountEntry(ASTransactionList * transactions,
     m_vatTaxableBase(false),
     m_account(NULL),
     m_category(NULL),
-    m_vatCategory(NULL),
     m_document(NULL)
 {
 }
@@ -269,7 +268,7 @@ const ASCategory * ASAccountEntry::getCategory() const
     return m_category;
 }
 
-bool ASAccountEntry::setVatCategory(const ASVatCategory * category)
+bool ASAccountEntry::addVatCategory(const ASVatCategory * category)
 {
     if (!category)
         return false;
@@ -277,13 +276,13 @@ bool ASAccountEntry::setVatCategory(const ASVatCategory * category)
     CHECK_COMMITED;
     CHECK_NOT_COMMITED(category);
 
-    m_vatCategory = category;
+    m_vatCategories.append(category);
     return true;
 }
 
-const ASVatCategory * ASAccountEntry::getVatCategory() const
+const ASVatCategoryList ASAccountEntry::getVatCategories() const
 {
-    return m_vatCategory;
+    return m_vatCategories;
 }
 
 bool ASAccountEntry::setDocument(const ASDocument * document)
@@ -376,12 +375,16 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
         e.appendChild(t);
         de->appendChild(e);
     }
-    if (getVatCategory() != NULL)
+    ASVatCategoryList::const_iterator it = getVatCategories().constBegin();
+    for(; it != getVatCategories().constEnd(); ++it)
     {
-        QDomElement e = doc->createElement("vatcategory");
-        QDomText t = doc->createTextNode(getVatCategory()->getUuid());
-        e.appendChild(t);
-        de->appendChild(e);
+        if (*it != NULL)
+        {
+            QDomElement e = doc->createElement("vatcategory");
+            QDomText t = doc->createTextNode((*it)->getUuid());
+            e.appendChild(t);
+            de->appendChild(e);
+        }
     }
     if (getDocument() != NULL)
     {
@@ -430,7 +433,7 @@ void ASAccountEntry::handleDomElement(QDomElement * de)
     }
     else if (n == "vatcategory")
     {
-        setVatCategory(dynamic_cast<ASVatCategory*>
+        addVatCategory(dynamic_cast<ASVatCategory*>
                        (m_transactions->getByUuid(de->text())));
     }
     else if (n == "document")

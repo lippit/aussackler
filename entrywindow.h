@@ -49,7 +49,7 @@ private slots:
     void on_amount_textEdited();
     void on_vatAmount_textEdited();
     void on_totalAmount_textEdited();
-    void on_vatCategory_currentIndexChanged(int index);
+    void on_vatCategory1_currentIndexChanged(int index);
     void on_buttonBox_accepted();
     void on_chooseDocument_clicked();
 
