@@ -89,29 +89,15 @@ QString ASCalc::getCalculation(int year, ASCategory * depreciationCategory)
     while (hit.hasNext()) {
         hit.next();
         QString line = QString("%1 %2\n")
-            .arg(hit.key()->getDescription(), hit.value() >= 0.0 ? -indent : 1-indent)
-            .arg(hit.value(), 0, 'f', 2);
+            .arg(hit.key()->getDescription(), -indent)
+            .arg(qAbs(hit.value()), 9, 'f', 2);
         report.append(line);
     }
 
     QString line = QString("\n%1 %2\n")
         .arg("Gesamt Gewinn/Verlust:", total >= 0.0 ? -indent : 1-indent)
-        .arg(total, 0, 'f', 2);
+        .arg(total, 9, 'f', 2);
     report.append(line);
-
-/*
-    report.append("\nGesamt Gewinn/Verlust: ");
-    for (int i=0; i<indent-23; ++i)
-    {
-        report.append(' ');
-    }
-    if (total >= 0.0)
-    {
-        report.append(' ');
-    }
-    report.append(QString::number((double)(qRound(total * 100)) / 100.0));
-    report.append("\n");
-*/
 
     return report;
 }
