@@ -44,6 +44,8 @@ int main(int argc, char * argv[])
 {
     QApplication app(argc, argv);
 
+    QLocale::setDefault(QLocale(QLocale::German, QLocale::Austria));
+
     Aussackler as;
 
     app.exec();

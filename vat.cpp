@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QFont>
+#include <QPair>
 #include "vat.h"
 #include "entry.h"
 #include "invest.h"
@@ -29,40 +30,76 @@ ASVat::ASVat(ASTransactionList * transactions, QObject * parent) :
 {
 }
 
-void ASVat::updateCalculation(int year, ASCategory * calcCategory)
+QString ASVat::getCalculation(int year)
 {
-    qDebug("Umsatzsteuer\n");
+    QString report;
 
-    double taxableBase = 0.0;
-    double vatPaid = 0.0;
+    QHash<const ASVatCategory *, QPair<double, double> > category;
 
-    QHash<const ASCategory *, double> category;
+    int indent = 15;
 
     ASTransactionList::const_iterator it = m_transactions->constBegin();
+    for (; it != m_transactions->constEnd(); ++it)
+    {
+        const ASVatCategory * cat = dynamic_cast<const ASVatCategory*>(*it);
+        if (cat)
+        {
+            category.insert(cat, QPair<double, double>(0.0, 0.0));
+            if (cat->getDescription().length() > indent)
+            {
+                indent = cat->getDescription().length();
+            }
+        }
+    }
+    indent += 3;
+
+    it = m_transactions->constBegin();
     for (; it != m_transactions->constEnd(); ++it)
     {
         const ASAccountEntry * ae = dynamic_cast<const ASAccountEntry*>(*it);
         if (!ae)
             continue;
 
-        if (ae->getOverwrittenBy() || ae->getDate().year() != year)
+        if (ae->getOverwrittenBy())
             continue;
 
-        if (ae->getCategory() == calcCategory)
+        if (ae->getDate().year() == year)
         {
-            taxableBase += ae->getAmount();
-        }
-        else
-        {
-            vatPaid -= ae->getVatAmount();
-        }
-
-        if (ae->getVatAmount() == 0 && ae->getAmount() < 0.0)
-        {
-            qDebug("%s; %f", ae->getDescription().toUtf8().constData(), ae->getAmount());
+            double charge = ae->getAmount() * ae->getChargePercentage() / 100.0;
+            double chargeVat = ae->getVatAmount() * ae->getChargePercentage() / 100.0;
+            ASVatCategoryList vl = ae->getVatCategories();
+            ASVatCategoryList::const_iterator it2 = vl.constBegin();
+            for (; it2 != vl.constEnd(); ++it2)
+            {
+                category[*it2].first += qAbs((double)(qRound(charge * 100)) / 100.0);
+                category[*it2].second += qAbs((double)(qRound(chargeVat * 100)) / 100.0);
+                const ASVatCategory * vp = (*it2)->getParent();
+                while (vp)
+                {
+                    category[vp].first += qAbs((double)(qRound(charge * 100)) / 100.0);
+                    category[vp].second += qAbs((double)(qRound(chargeVat * 100)) / 100.0);
+                    vp = vp->getParent();
+                }
+            }
         }
     }
 
-    qDebug("\nBemessungsgrundlage: %f", taxableBase);
-    qDebug("Vorsteuer: %f\n", vatPaid);
+    QString line = QString("%1 %2 %3\n")
+        .arg("Description", -indent)
+        .arg("Base amount", 15)
+        .arg("VAT amount", 15);
+    report.append(line);
+    report.append("\n");
+
+    QHashIterator<const ASVatCategory *, QPair<double, double> > hit(category);
+    while (hit.hasNext()) {
+        hit.next();
+        line = QString("%1 %2 %3\n")
+            .arg(hit.key()->getDescription(), -indent)
+            .arg(hit.value().first, 15, 'f', 2)
+            .arg(hit.value().second, 15, 'f', 2);
+        report.append(line);
+    }
+
+    return report;
 }

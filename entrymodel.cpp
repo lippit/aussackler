@@ -54,7 +54,7 @@ int EntryModel::columnCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return 10;
+    return 11;
 }
 
 QVariant EntryModel::data(const QModelIndex& index, int role) const
@@ -106,8 +106,10 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
         case 7:
             return tr("Kategorie");
         case 8:
-            return tr("Beleg");
+            return tr("Ust. Kategorie");
         case 9:
+            return tr("Beleg");
+        case 10:
             return tr("Belegdatum");
         default:
             return QVariant();
@@ -152,11 +154,21 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
             }
         }
     case 8:
+        if (e->getVatCategories().count() > 0 &&
+            e->getVatCategories()[0])
+        {
+            return e->getVatCategories()[0]->getDescription();
+        }
+        else
+        {
+            return "-";
+        }
+    case 9:
         if (e->getDocument())
             return e->getDocument()->getLatest()->getDescription();
         else
             return "";
-    case 9:
+    case 10:
         if (e->getDocument())
         {
             const ASDocument * d =

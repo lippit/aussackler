@@ -31,7 +31,7 @@ class ASVat : public QObject
 public:
     ASVat(ASTransactionList * transactions, QObject * parent = NULL);
 
-    void updateCalculation(int year, ASCategory * calcCategory);
+    QString getCalculation(int year);
 
 protected:
     ASTransactionList * m_transactions;

@@ -110,8 +110,6 @@ public:
     bool setChargePercentage(double chargePercentage);
     double getChargePercentage() const;
     int getVatPercentage() const;
-    bool getVatTaxableBase() const;
-    bool setVatTaxableBase(bool vatTaxableBase);
     bool setAccount(const ASAccount * account);
     const ASAccount * getAccount() const;
     bool setCategory(const ASCategory * category);

@@ -484,9 +484,7 @@ void ASMainWindow::on_tabWidget_currentChanged(int index)
         }
         break;
     case 3:
-        m_vat->updateCalculation(year, (ASCategory*)settingsUi.categories2->itemData(
-                                     settingsUi.categories2->currentIndex()).
-                                 value<void *>());
+        ui.vat->setText(m_vat->getCalculation(year));
         break;
     default:
         break;
