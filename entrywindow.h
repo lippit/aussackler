@@ -71,7 +71,6 @@ private:
 
     void setEntryType();
     void calculateVat();
-    void setVatPercentage();
     void calculateTotal();
 };
 

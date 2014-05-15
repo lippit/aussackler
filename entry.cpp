@@ -171,7 +171,6 @@ ASAccountEntry::ASAccountEntry(ASTransactionList * transactions,
     m_amount(0.0),
     m_vatAmount(0.0),
     m_chargePercentage(100.0),
-    m_vatTaxableBase(false),
     m_account(NULL),
     m_category(NULL),
     m_document(NULL)
@@ -215,19 +214,6 @@ bool ASAccountEntry::setChargePercentage(double chargePercentage)
 double ASAccountEntry::getChargePercentage() const
 {
     return m_chargePercentage;
-}
-
-bool ASAccountEntry::setVatTaxableBase(bool vatTaxableBase)
-{
-    CHECK_COMMITED;
-
-    m_vatTaxableBase = vatTaxableBase;
-    return true;
-}
-
-bool ASAccountEntry::getVatTaxableBase() const
-{
-    return m_vatTaxableBase;
 }
 
 int ASAccountEntry::getVatPercentage() const
@@ -356,11 +342,6 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
         e.appendChild(t);
         de->appendChild(e);
     }
-    if (getVatTaxableBase())
-    {
-        QDomElement e = doc->createElement("vattaxablebase");
-        de->appendChild(e); 
-    }
     if (getAccount() != NULL)
     {
         QDomElement e = doc->createElement("account");
@@ -416,10 +397,6 @@ void ASAccountEntry::handleDomElement(QDomElement * de)
     else if (n == "chargepercentage")
     {
         setChargePercentage(de->text().toDouble());
-    }
-    else if (n == "vattaxablebase")
-    {
-        setVatTaxableBase(true);
     }
     else if (n == "account")
     {

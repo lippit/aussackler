@@ -181,13 +181,13 @@ void ASEntryWindow::on_amount_textEdited()
 {
     setEntryType();
     calculateVat();
-    setVatPercentage();
+    //setVatPercentage();
     calculateTotal();
 }
 
 void ASEntryWindow::on_vatAmount_textEdited()
 {
-    setVatPercentage();
+    //setVatPercentage();
     calculateTotal();
 }
 
@@ -216,7 +216,7 @@ void ASEntryWindow::on_totalAmount_textEdited()
         ui.vatAmount->setText(QString::number(vatAmount));
     }
     setEntryType();
-    setVatPercentage();
+    //setVatPercentage();
 }
 
 void ASEntryWindow::on_vatCategory1_currentIndexChanged(int index)
@@ -250,7 +250,6 @@ void ASEntryWindow::on_buttonBox_accepted()
     e->setDescription(ui.entryDescription->text());
     e->setAmount(ui.amount->text().toDouble());
     e->setVatAmount(ui.vatAmount->text().toDouble());
-    e->setVatTaxableBase(ui.vatTaxableBase->isChecked());
     e->setChargePercentage(ui.chargePercentage->value());
     e->setAccount((ASAccount*)ui.account->itemData(
                       ui.account->currentIndex()).value<void *>());
@@ -364,7 +363,7 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
         if (ae->getVatCategories().count() > 0 &&
             ui.vatCategory1->itemText(i) == ae->getVatCategories()[0]->getDescription())
         {
-            ui.category->setCurrentIndex(i);
+            ui.vatCategory1->setCurrentIndex(i);
             break;
         }
     }
@@ -373,7 +372,7 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
         if (ae->getVatCategories().count() > 1 &&
             ui.vatCategory2->itemText(i) == ae->getVatCategories()[1]->getDescription())
         {
-            ui.category->setCurrentIndex(i);
+            ui.vatCategory2->setCurrentIndex(i);
             break;
         }
     }
@@ -383,7 +382,7 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
     ui.vatAmount->setText(QString::number(ae->getVatAmount()));
     ui.chargePercentage->setValue(ae->getChargePercentage());
     setEntryType();
-    setVatPercentage();
+    //setVatPercentage();
     calculateTotal();
 }
 
@@ -472,39 +471,17 @@ void ASEntryWindow::calculateVat()
 {
     if (!ui.amount->text().isEmpty())
     {
-        double vp = ((ASVatCategory*)ui.vatCategory1->itemData(
-                         ui.vatCategory1->currentIndex()).value<void *>())
-            ->getVatPercentage();
+        double vp = 0.0;
+        ASVatCategory * ac = (ASVatCategory*)ui.vatCategory1->itemData(
+            ui.vatCategory1->currentIndex()).value<void *>();
+        if (ac)
+            vp = ac->getVatPercentage();
         if (vp >= 0)
         {
             double vat = qRound(vp * ui.amount->text().toDouble()) / 100.0;
             ui.vatAmount->setText(QString::number(vat));
-            ui.vatTaxableBase->setChecked(vat > 0.0);
         }
     }
-}
-
-void ASEntryWindow::setVatPercentage()
-{
-    double amount = ui.amount->text().toDouble();
-    double vatAmount = ui.vatAmount->text().toDouble();
-
-    if (amount == 0.0)
-        return;
-
-    double vat = 100.0 * vatAmount / amount;
-
-    for (int i=0; i<ui.vatCategory1->count(); ++i)
-    {
-        double vp = ((ASVatCategory*)ui.vatCategory1->itemData(i).value<void *>())
-            ->getVatPercentage();
-        if(qAbs(vp - vat) < 0.1)
-        {
-            ui.vatCategory1->setCurrentIndex(i);
-            return;
-        }
-    }
-    ui.vatCategory1->setCurrentIndex(ui.vatCategory1->count()-1);
 }
 
 void ASEntryWindow::calculateTotal()
