@@ -195,9 +195,11 @@ void ASEntryWindow::on_totalAmount_textEdited()
 
     if (!ui.amount->isModified())
     {
-        double vp = ((ASVatCategory*)ui.vatCategory1->itemData(
-                         ui.vatCategory1->currentIndex()).value<void *>())
-            ->getVatPercentage();
+        ASVatCategory * av = ((ASVatCategory*)ui.vatCategory1->itemData(
+                                  ui.vatCategory1->currentIndex()).value<void *>());
+        double vp = 0.0;
+        if (av)
+            vp = av->getVatPercentage();
         if (vp > 0.0)
         {
             double amount = qRound(100.0 * totalAmount /
