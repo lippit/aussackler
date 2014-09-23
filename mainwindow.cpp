@@ -458,33 +458,38 @@ void ASMainWindow::on_actionQuit_activated()
 
 void ASMainWindow::on_tabWidget_currentChanged(int index)
 {
-    int year;
+    QDate fromDate;
+    QDate toDate;
     ASCategory * depreciationCategory;
-    if (settingsDialog && !settingsUi.year->text().isEmpty())
+    if (settingsDialog)
     {
-        year = settingsUi.year->text().toInt();
-        depreciationCategory = (ASCategory*)settingsUi.categories->itemData(
+        depreciationCategory =
+        (ASCategory*)settingsUi.categories->itemData(
             settingsUi.categories->currentIndex()).value<void *>();
+        fromDate = settingsUi.from->date();
+        toDate = settingsUi.to->date();
     }
     else
     {
-        year = QDate::currentDate().year();
         depreciationCategory = NULL;
+        fromDate = QDate::currentDate();
+        toDate = QDate::currentDate();
     }
 
     switch(index)
     {
     case 1:
-        ui.summary->setText(m_calc->getCalculation(year, depreciationCategory));
+        ui.summary->setText(m_calc->getCalculation(fromDate, toDate,
+                                                   depreciationCategory));
         break;
     case 2:
         if (m_assetsModel)
         {
-            m_assetsModel->setYear(year);
+            m_assetsModel->setPeriod(fromDate, toDate);
         }
         break;
     case 3:
-        ui.vat->setText(m_vat->getCalculation(year));
+        ui.vat->setText(m_vat->getCalculation(fromDate, toDate));
         break;
     default:
         break;

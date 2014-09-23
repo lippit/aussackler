@@ -20,6 +20,7 @@
 #ifndef VAT_H
 #define VAT_H
 
+#include <QDate>
 #include "tsort.h"
 #include "transaction.h"
 #include "entry.h"
@@ -31,7 +32,7 @@ class ASVat : public QObject
 public:
     ASVat(ASTransactionList * transactions, QObject * parent = NULL);
 
-    QString getCalculation(int year);
+    QString getCalculation(const QDate& fromDate, const QDate& toDate);
 
 protected:
     ASTransactionList * m_transactions;

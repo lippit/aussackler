@@ -30,7 +30,7 @@ ASVat::ASVat(ASTransactionList * transactions, QObject * parent) :
 {
 }
 
-QString ASVat::getCalculation(int year)
+QString ASVat::getCalculation(const QDate& fromDate, const QDate& toDate)
 {
     QString report;
 
@@ -63,7 +63,7 @@ QString ASVat::getCalculation(int year)
         if (ae->getOverwrittenBy())
             continue;
 
-        if (ae->getDate().year() == year)
+        if (ae->getDate() >= fromDate && ae->getDate() <= toDate)
         {
             double charge = ae->getAmount() * ae->getChargePercentage() / 100.0;
             double chargeVat = ae->getVatAmount() * ae->getChargePercentage() / 100.0;

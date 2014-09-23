@@ -29,7 +29,8 @@ ASCalc::ASCalc(ASTransactionList * transactions, QObject * parent) :
 {
 }
 
-QString ASCalc::getCalculation(int year, ASCategory * depreciationCategory)
+QString ASCalc::getCalculation(const QDate& fromDate, const QDate& toDate,
+                               ASCategory * depreciationCategory)
 {
     QString report;
 
@@ -67,16 +68,19 @@ QString ASCalc::getCalculation(int year, ASCategory * depreciationCategory)
 
         if (ie)
         {
-            double depreciation = ie->getDepreciation(year) * ie->getChargePercentage() / 100.0;
-            if (depreciationCategory)
+            for (int y = fromDate.year(); y <= toDate.year(); y++)
             {
-                category[depreciationCategory] += depreciation;
+                double depreciation = ie->getDepreciation(y) * ie->getChargePercentage() / 100.0;
+                if (depreciationCategory)
+                {
+                    category[depreciationCategory] += depreciation;
+                }
+                total += depreciation;
             }
-            total += depreciation;
         }
         else
         {
-            if (ae->getDate().year() == year)
+            if (ae->getDate() >= fromDate && ae->getDate() <= toDate)
             {
                 double charge = ae->getAmount() * ae->getChargePercentage() / 100.0;
                 category[ae->getCategory()] += (double)(qRound(charge * 100)) / 100.0;

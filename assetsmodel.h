@@ -21,6 +21,7 @@
 #define ASSETSMODEL_H
 
 #include <QAbstractTableModel>
+#include <QDate>
 #include "tsort.h"
 #include "transaction.h"
 #include "invest.h"
@@ -37,13 +38,15 @@ public:
     virtual int columnCount(const QModelIndex& parent) const;
     virtual QVariant data(const QModelIndex& index, int role) const;
 
-    void setYear(int year) {m_year = year;}
+    void setPeriod(const QDate& fromDate, const QDate& toDate)
+    {m_fromDate = fromDate; m_toDate = toDate;}
 
 public slots:
     void transactionsChanged();
 
 private:
-    int m_year;
+    QDate m_fromDate;
+    QDate m_toDate;
 };
 
 #endif

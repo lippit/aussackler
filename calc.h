@@ -20,6 +20,7 @@
 #ifndef CALC_H
 #define CALC_H
 
+#include <QDate>
 #include "tsort.h"
 #include "transaction.h"
 #include "entry.h"
@@ -31,7 +32,8 @@ class ASCalc : public QObject
 public:
     ASCalc(ASTransactionList * transactions, QObject * parent = NULL);
 
-    QString getCalculation(int year, ASCategory * depreciationCategory);
+    QString getCalculation(const QDate& fromDate, const QDate& toDate,
+                           ASCategory * depreciationCategory);
 
 protected:
     ASTransactionList * m_transactions;

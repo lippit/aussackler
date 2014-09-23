@@ -25,8 +25,7 @@
 
 AssetsModel::AssetsModel(ASTransactionList * transactions, QObject * parent) :
     QAbstractTableModel(parent),
-    ASTransactionSorter(transactions),
-    m_year(0)
+    ASTransactionSorter(transactions)
 {
 }
 
@@ -118,7 +117,12 @@ QVariant AssetsModel::data(const QModelIndex& index, int role) const
     case 3:
         return e->getAmount();
     case 4:
-        return e->getDepreciation(m_year);
+    {
+        double d = 0.0;
+        for (int y = m_fromDate.year(); y <= m_toDate.year(); y++)
+            d += e->getDepreciation(y);
+        return d;
+    }
     }
 
     return QVariant();

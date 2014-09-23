@@ -181,13 +181,11 @@ void ASEntryWindow::on_amount_textEdited()
 {
     setEntryType();
     calculateVat();
-    //setVatPercentage();
     calculateTotal();
 }
 
 void ASEntryWindow::on_vatAmount_textEdited()
 {
-    //setVatPercentage();
     calculateTotal();
 }
 
@@ -216,13 +214,13 @@ void ASEntryWindow::on_totalAmount_textEdited()
         ui.vatAmount->setText(QString::number(vatAmount));
     }
     setEntryType();
-    //setVatPercentage();
 }
 
 void ASEntryWindow::on_vatCategory1_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
-    calculateVat();
+    if (ui.vatAmount->text().isEmpty())
+        calculateVat();
     calculateTotal();
 }
 
@@ -331,7 +329,10 @@ void ASEntryWindow::setOverride(ASTransaction * override)
         ui.depreciationPeriod->setValue(ie->getDepreciationPeriod());
     }
 
-    m_selectedDocument = (ASDocument*)ae->getDocument();
+    m_selectedDocument = ae->getDocument();
+    while (m_selectedDocument->getOverwrittenBy())
+        m_selectedDocument = dynamic_cast<const ASDocument *>(
+            m_selectedDocument->getOverwrittenBy());
 
     documentSetup();
 
@@ -358,22 +359,30 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
             break;
         }
     }
-    for (int i=0; i<ui.vatCategory1->count(); ++i)
+    if (ae->getVatCategories().count() == 0)
     {
-        if (ae->getVatCategories().count() > 0 &&
-            ui.vatCategory1->itemText(i) == ae->getVatCategories()[0]->getDescription())
-        {
-            ui.vatCategory1->setCurrentIndex(i);
-            break;
-        }
+        ui.vatCategory1->setCurrentIndex(0);
+        ui.vatCategory2->setCurrentIndex(0);
     }
-    for (int i=0; i<ui.vatCategory2->count(); ++i)
+    else
     {
-        if (ae->getVatCategories().count() > 1 &&
-            ui.vatCategory2->itemText(i) == ae->getVatCategories()[1]->getDescription())
+        for (int i=0; i<ui.vatCategory1->count(); ++i)
         {
-            ui.vatCategory2->setCurrentIndex(i);
-            break;
+            if (ae->getVatCategories().count() > 0 &&
+                ui.vatCategory1->itemText(i) == ae->getVatCategories()[0]->getDescription())
+            {
+                ui.vatCategory1->setCurrentIndex(i);
+                break;
+            }
+        }
+        for (int i=0; i<ui.vatCategory2->count(); ++i)
+        {
+            if (ae->getVatCategories().count() > 1 &&
+                ui.vatCategory2->itemText(i) == ae->getVatCategories()[1]->getDescription())
+            {
+                ui.vatCategory2->setCurrentIndex(i);
+                break;
+            }
         }
     }
     ui.entryDescription->setText(ae->getDescription());
@@ -382,7 +391,6 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
     ui.vatAmount->setText(QString::number(ae->getVatAmount()));
     ui.chargePercentage->setValue(ae->getChargePercentage());
     setEntryType();
-    //setVatPercentage();
     calculateTotal();
 }
 
