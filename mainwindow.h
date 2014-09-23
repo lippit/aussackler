@@ -43,6 +43,10 @@ public:
     ASMainWindow(ASTransactionList * transactions,
                  QWidget * parent = 0);
 
+signals:
+    void signalLoad(const QString fileName);
+    void signalSave(const QString fileName);
+
 private slots:
     void on_actionNew_activated();
     void on_actionLoad_activated();

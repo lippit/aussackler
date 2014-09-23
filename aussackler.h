@@ -30,7 +30,9 @@ public:
     Aussackler();
     ~Aussackler();
 
-    void createEntry();
+public slots:
+    void slotLoadFile(const QString fileName);
+    void slotSaveFile(const QString fileName);
 
 private:
     ASTransactionList m_transactions;

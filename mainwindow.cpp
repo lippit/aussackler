@@ -345,22 +345,7 @@ void ASMainWindow::on_actionSave_activated()
         return;
     }
 
-    QDomDocument doc("aussackler");
-    QDomElement root = doc.createElement("aussackler");
-    doc.appendChild(root);
-    ASTransactionList::const_iterator it = m_transactions->constBegin();
-    for(; it != m_transactions->constEnd(); ++it)
-    {
-        QDomElement de = doc.createElement("transaction");
-        (*it)->writeToXml(&doc, &de);
-        root.appendChild(de);
-    }
-
-    QFile file(m_currentFileName);
-    if (!file.open(QIODevice::WriteOnly))
-        return;
-    file.write(doc.toByteArray(4));
-    file.close();
+    emit signalSave(m_currentFileName);
 }
 
 void ASMainWindow::on_actionSaveas_activated()
@@ -384,67 +369,10 @@ void ASMainWindow::on_actionLoad_activated()
     if (m_currentFileName.isEmpty())
         return;
 
-    QDomDocument doc("aussackler");
-    QFile file(m_currentFileName);
-    if (!file.open(QIODevice::ReadOnly))
-        return;
-    if (!doc.setContent(&file)) {
-        file.close();
-        return;
-    }
-    file.close();
-
     on_actionNew_activated();
-
-    QDomElement docElem = doc.documentElement();
-
     disconnectModels();
 
-    QDomNode n = docElem.firstChild();
-    while(!n.isNull())
-    {
-        QDomElement e = n.toElement();
-        if(!e.isNull() && e.tagName() == "transaction")
-        {
-            if (!e.hasAttribute("type"))
-                continue;
-            ASTransaction::TransactionType type =
-                (ASTransaction::TransactionType)
-                ASTransaction::TransactionTypeStrings.
-                indexOf(e.attribute("type"));
-            ASTransaction * a = NULL;
-            switch(type)
-            {
-            case ASTransaction::TRANSACTION_TYPE_BASE:
-                a = new ASTransaction(m_transactions);
-                break;
-            case ASTransaction::TRANSACTION_TYPE_CATEGORY:
-                a = new ASCategory(m_transactions);
-                break;
-            case ASTransaction::TRANSACTION_TYPE_ACCOUNT:
-                a = new ASAccount(m_transactions);
-                break;
-            case ASTransaction::TRANSACTION_TYPE_ACCOUNTENTRY:
-                a = new ASAccountEntry(m_transactions);
-                break;
-            case ASTransaction::TRANSACTION_TYPE_INVESTMENT:
-                a = new ASInvestEntry(m_transactions);
-                break;
-            case ASTransaction::TRANSACTION_TYPE_DOCUMENT:
-                a = new ASDocument(m_transactions);
-                break;
-            case ASTransaction::TRANSACTION_TYPE_VATCATEGORY:
-                a = new ASVatCategory(m_transactions);
-                break;
-            }
-            if (a)
-            {
-                a->readFromXml(&e);
-                a->commit();
-            }
-        }
-        n = n.nextSibling();
-    }
+    emit signalLoad(m_currentFileName);
 
     connectModels();
 
