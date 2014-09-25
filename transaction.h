@@ -99,6 +99,8 @@ public:
 
     bool setDescription(const QString& description);
     const QString getDescription() const;
+    bool setHidden();
+    bool getHidden() {return m_hidden;}
 
     const QDateTime getCreationTimestamp() const;
     const QUuid getUuid() const;
@@ -128,6 +130,7 @@ protected:
     ASTransaction * m_overrides;
     ASTransaction * m_overwrittenBy;
     ASTransactionList * m_transactions;
+    bool m_hidden;
     bool m_committed;
 
     virtual void handleDomElement(QDomElement * de);

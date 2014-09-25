@@ -49,6 +49,7 @@ ASTransaction::ASTransaction(ASTransactionList * transactions,
                              ASTransaction * overrides) :
     m_overwrittenBy(NULL),
     m_transactions(transactions),
+    m_hidden(false),
     m_committed(false)
 {
     if (m_transactions)
@@ -72,6 +73,14 @@ bool ASTransaction::setDescription(const QString& description)
     CHECK_COMMITED;
 
     m_description = description;
+    return true;
+}
+
+bool ASTransaction::setHidden()
+{
+    CHECK_COMMITED;
+
+    m_hidden = true;
     return true;
 }
 

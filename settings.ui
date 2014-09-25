@@ -88,12 +88,6 @@
        </item>
        <item>
         <widget class="QDateEdit" name="to">
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>16777215</height>
-          </size>
-         </property>
          <property name="displayFormat">
           <string>dd.MM.yyyy</string>
          </property>

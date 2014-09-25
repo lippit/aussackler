@@ -106,6 +106,7 @@
     <addaction name="separator"/>
     <addaction name="actionNewEntry"/>
     <addaction name="actionCorrectEntry"/>
+    <addaction name="actionDeleteEntry"/>
     <addaction name="actionNewDocument"/>
     <addaction name="actionCorrectDocument"/>
     <addaction name="actionNewAccount"/>
@@ -228,6 +229,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionDeleteEntry">
+   <property name="text">
+    <string>Buchung löschen</string>
    </property>
   </action>
  </widget>

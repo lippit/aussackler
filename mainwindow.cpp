@@ -184,6 +184,41 @@ void ASMainWindow::on_actionCorrectEntry_activated()
     }
 }
 
+void ASMainWindow::on_actionDeleteEntry_activated()
+{
+    QItemSelectionModel * sm = ui.mainTable->selectionModel();
+
+    if (sm && sm->hasSelection())
+    {
+        QModelIndex mi = sm->currentIndex();
+        if (mi.isValid())
+        {
+            ASAccountEntry * ae = m_entryModel->getTransactionByRow(mi.row());
+            if (ae)
+            {
+                ASAccountEntry * e = new ASAccountEntry(m_transactions, ae);
+                e->setDescription(ae->getDescription());
+                e->setAmount(0);
+                e->setVatAmount(0);
+                e->setChargePercentage(ae->getChargePercentage());
+                e->setAccount(ae->getAccount());
+                e->setDate(ae->getDate());
+                e->setDocument(ae->getDocument());
+                e->setHidden();
+                e->commit();
+                ui.mainTable->clearSelection();
+            }
+            else
+            {
+                QMessageBox::critical(this,
+                                      tr("Fehler"),
+                                      tr("Bitte wählen Sie die Buchun, "
+                                         "die gelöscht werden soll."));
+            }
+        }
+    }
+}
+
 void ASMainWindow::on_actionNewDocument_activated()
 {
     m_docOverride = NULL;

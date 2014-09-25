@@ -43,7 +43,7 @@ public:
         {
             T e = dynamic_cast<T>
                 (m_transactions->at(i));
-            if (e != NULL)
+            if (e != NULL && !e->getHidden())
             {
                 m_subsetList.append(e);
             }

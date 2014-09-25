@@ -57,6 +57,7 @@ private slots:
     void on_actionAddEntries_activated();
     void on_actionNewEntry_activated();
     void on_actionCorrectEntry_activated();
+    void on_actionDeleteEntry_activated();
     void on_actionNewDocument_activated();
     void on_actionCorrectDocument_activated();
     void on_actionNewAccount_activated();
