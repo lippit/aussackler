@@ -61,7 +61,7 @@ QString ASCalc::getCalculation(const QDate& fromDate, const QDate& toDate,
         if (!ae)
             continue;
 
-        if (ae->getOverwrittenBy())
+        if (ae->getOverwrittenBy() || ae->getHidden())
             continue;
 
         const ASInvestEntry * ie = dynamic_cast<const ASInvestEntry*>(ae);

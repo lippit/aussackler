@@ -144,6 +144,10 @@ void ASTransaction::writeToXml(QDomDocument * doc, QDomElement * de)
     {
         de->setAttribute("overrides", getOverride()->getUuid());
     }
+    if (getHidden())
+    {
+        de->setAttribute("hidden", "true");
+    }
     if (!getDescription().isEmpty())
     {
         QDomElement desc = doc->createElement("description");
@@ -166,6 +170,10 @@ void ASTransaction::readFromXml(QDomElement * de)
         {
             m_overrides->m_overwrittenBy = this;
         }
+    }
+    if (de->hasAttribute("hidden"))
+    {
+        m_hidden = true;
     }
 
     QDomNode n = de->firstChild();

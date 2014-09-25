@@ -100,7 +100,7 @@ public:
     bool setDescription(const QString& description);
     const QString getDescription() const;
     bool setHidden();
-    bool getHidden() {return m_hidden;}
+    bool getHidden() const {return m_hidden;}
 
     const QDateTime getCreationTimestamp() const;
     const QUuid getUuid() const;

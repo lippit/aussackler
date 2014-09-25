@@ -235,6 +235,9 @@
    <property name="text">
     <string>Buchung löschen</string>
    </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
   </action>
  </widget>
  <resources/>

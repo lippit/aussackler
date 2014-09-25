@@ -60,7 +60,7 @@ QString ASVat::getCalculation(const QDate& fromDate, const QDate& toDate)
         if (!ae)
             continue;
 
-        if (ae->getOverwrittenBy())
+        if (ae->getOverwrittenBy() || ae->getHidden())
             continue;
 
         if (ae->getDate() >= fromDate && ae->getDate() <= toDate)
