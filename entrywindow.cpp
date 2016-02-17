@@ -241,11 +241,11 @@ void ASEntryWindow::on_buttonBox_accepted()
         e = new ASAccountEntry(m_transactions, m_override);
         e->setCategory((ASCategory*)ui.category->itemData(
                            ui.category->currentIndex()).value<void *>());
-        e->addVatCategory((ASVatCategory*)ui.vatCategory1->itemData(
-                              ui.vatCategory1->currentIndex()).value<void *>());
-        e->addVatCategory((ASVatCategory*)ui.vatCategory2->itemData(
-                              ui.vatCategory2->currentIndex()).value<void *>());
     }
+    e->addVatCategory((ASVatCategory*)ui.vatCategory1->itemData(
+                          ui.vatCategory1->currentIndex()).value<void *>());
+    e->addVatCategory((ASVatCategory*)ui.vatCategory2->itemData(
+                          ui.vatCategory2->currentIndex()).value<void *>());
 
     e->setDescription(ui.entryDescription->text());
     e->setAmount(ui.amount->text().toDouble());
