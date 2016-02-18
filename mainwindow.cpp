@@ -65,7 +65,7 @@ void ASMainWindow::connectModels()
     connect(m_transactions, SIGNAL(newTransaction()),
             m_entryModel, SLOT(transactionsChanged()));
     connect(m_transactions, SIGNAL(newTransaction()),
-            m_entryModel, SLOT(transactionsChanged()));
+            m_assetsModel, SLOT(transactionsChanged()));
     connect(m_transactions, SIGNAL(newTransaction()),
             m_docModel, SLOT(transactionsChanged()));
 }
@@ -448,6 +448,7 @@ void ASMainWindow::on_tabWidget_currentChanged(int index)
     case 2:
         if (m_assetsModel)
         {
+            m_assetsModel->transactionsChanged();
             m_assetsModel->setPeriod(fromDate, toDate);
         }
         break;
