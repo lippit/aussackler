@@ -32,6 +32,11 @@ public:
         m_lastTransactionSize = 0;
     }
 
+    static bool lessThanByDescription(ASTransaction * e1, ASTransaction * e2)
+    {
+        return e1->getDescription().toLower() < e2->getDescription().toLower();
+    }
+
     int sortoutTransactions()
     {
         if (m_lastTransactionSize == m_transactions->size())
@@ -48,6 +53,9 @@ public:
                 m_subsetList.append(e);
             }
         }
+
+        qSort(m_subsetList.begin(), m_subsetList.end(),
+              lessThanByDescription);
 
         m_lastTransactionSize = m_transactions->size();
 
