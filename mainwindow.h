@@ -20,6 +20,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QSortFilterProxyModel>
 #include "ui_mainwindow.h"
 #include "ui_account.h"
 #include "ui_document.h"
@@ -90,6 +91,7 @@ private:
     QDialog * settingsDialog;
     ASTransactionList * m_transactions;
     EntryModel * m_entryModel;
+    QSortFilterProxyModel * m_proxyModel;
     DocModel * m_docModel;
     AssetsModel * m_assetsModel;
     ASCalc * m_calc;

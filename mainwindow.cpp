@@ -35,6 +35,7 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
     settingsDialog(NULL),
     m_transactions(transactions),
     m_entryModel(NULL),
+    m_proxyModel(NULL),
     m_docModel(NULL),
     m_assetsModel(NULL),
     m_calc(NULL),
@@ -104,6 +105,7 @@ void ASMainWindow::on_actionNew_activated()
     ui.mainTable->setModel(NULL);
     ui.investTable->setModel(NULL);
 
+    delete m_proxyModel;
     delete m_entryModel;
     delete m_docModel;
     delete m_assetsModel;
@@ -111,12 +113,15 @@ void ASMainWindow::on_actionNew_activated()
     //delete m_investModel;
 
     m_entryModel = new EntryModel(m_transactions);
+    m_proxyModel = new QSortFilterProxyModel;
     m_docModel = new DocModel(m_transactions);
     m_assetsModel = new AssetsModel(m_transactions);
     m_calc = new ASCalc(m_transactions);
     m_vat = new ASVat(m_transactions);
 
-    ui.mainTable->setModel(m_entryModel);
+    m_proxyModel->setSourceModel(m_entryModel);
+
+    ui.mainTable->setModel(m_proxyModel);
     ui.investTable->setModel(m_assetsModel);
     docUi.tableView->setModel(m_docModel);
 
