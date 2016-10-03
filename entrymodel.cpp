@@ -36,7 +36,7 @@ void EntryModel::transactionsChanged()
     if (n)
     {
         QModelIndex index;
-        beginInsertRows(index, rowsBefore + 1, rowsBefore + n);
+        beginInsertRows(index, rowsBefore, rowsBefore + n - 1);
         endInsertRows();
     }
 }
@@ -46,7 +46,7 @@ int EntryModel::rowCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return rows() + 1;
+    return rows();
 }
 
 int EntryModel::columnCount(const QModelIndex& parent) const
@@ -60,19 +60,13 @@ int EntryModel::columnCount(const QModelIndex& parent) const
 QVariant EntryModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid())
-         return QVariant();
+        return QVariant();
 
     if (role == Qt::FontRole)
     {
-        if (index.row() == 0)
+        if (index.row() >= 0)
         {
-            QFont f = QApplication::font();
-            f.setBold(true);
-            return f;
-        }
-        else if (index.row() > 0)
-        {
-            ASAccountEntry * e = getSubsetList()[index.row()-1];
+            ASAccountEntry * e = getSubsetList()[index.row()];
             if (e->getOverwrittenBy() != NULL)
             {
                 QFont f = QApplication::font();
@@ -85,45 +79,14 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    if (role == Qt::DisplayRole && index.row() == 0)
-    {
-        switch(index.column())
-        {
-        case 0:
-            return tr("Beschreibung");
-        case 1:
-            return tr("Buchungsdatum");
-        case 2:
-            return tr("Betrag Netto");
-        case 3:
-            return tr("Ust. Betrag");
-        case 4:
-            return tr("Betrag Brutto");
-        case 5:
-            return tr("Betr. Anteil");
-        case 6:
-            return tr("Konto");
-        case 7:
-            return tr("Kategorie");
-        case 8:
-            return tr("Ust. Kategorie");
-        case 9:
-            return tr("Beleg");
-        case 10:
-            return tr("Belegdatum");
-        default:
-            return QVariant();
-        }
-    }
-
-    ASAccountEntry * e = getSubsetList()[index.row()-1];
+    ASAccountEntry * e = getSubsetList()[index.row()];
 
     switch(index.column())
     {
     case 0:
         return e->getDescription();
     case 1:
-        return e->getDate().toString(tr("dd.MM.yyyy"));
+      return e->getDate();
     case 2:
         return e->getAmount();
     case 3:
@@ -182,4 +145,48 @@ QVariant EntryModel::data(const QModelIndex& index, int role) const
     }
 
     return QVariant();
+}
+
+QVariant EntryModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole || section < 0)
+        return QVariant();
+
+    if (orientation == Qt::Horizontal) {
+        switch(section)
+        {
+        case 0:
+          return tr("Beschreibung");
+        case 1:
+          return tr("Buchungsdatum");
+        case 2:
+          return tr("Betrag Netto");
+        case 3:
+          return tr("Ust. Betrag");
+        case 4:
+          return tr("Betrag Brutto");
+        case 5:
+          return tr("Betr. Anteil");
+        case 6:
+          return tr("Konto");
+        case 7:
+          return tr("Kategorie");
+        case 8:
+          return tr("Ust. Kategorie");
+        case 9:
+          return tr("Beleg");
+        case 10:
+          return tr("Belegdatum");
+        default:
+          return QVariant();
+        }
+    }
+    else if (orientation == Qt::Vertical)
+    {
+        return section + 1;
+    }
+    else
+    {
+        return QVariant();
+    }
 }
