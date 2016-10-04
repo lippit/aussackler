@@ -59,10 +59,9 @@ public:
     T getTransactionByRow(int row)
     {
         QList<T> l = getSubsetList();
-        int r = row - 1;
-        if (r < 0 || l.size() <= r)
+        if (row < 0 || l.size() <= row)
             return NULL;
-        return l.at(r);
+        return l.at(row);
     }
 
     int rows() const {return m_subsetList.size();}

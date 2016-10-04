@@ -213,7 +213,7 @@
   </action>
   <action name="actionCorrectEntry">
    <property name="text">
-    <string>Buchung korrigieren</string>
+    <string>Buchung bearbeiten</string>
    </property>
   </action>
   <action name="actionCorrectDocument">

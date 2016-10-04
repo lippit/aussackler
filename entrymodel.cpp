@@ -190,3 +190,8 @@ QVariant EntryModel::headerData(int section, Qt::Orientation orientation, int ro
         return QVariant();
     }
 }
+
+ASAccountEntry * EntryModel::getEntry(const QModelIndex& index)
+{
+    return getTransactionByRow(index.row());
+}

@@ -169,7 +169,7 @@ void ASMainWindow::on_actionCorrectEntry_activated()
 
     if (sm && sm->hasSelection())
     {
-        QModelIndex mi = sm->currentIndex();
+        QModelIndex mi = m_proxyModel->mapToSource(sm->currentIndex());
         if (mi.isValid())
         {
             ASAccountEntry * ae = m_entryModel->getTransactionByRow(mi.row());
@@ -182,7 +182,7 @@ void ASMainWindow::on_actionCorrectEntry_activated()
             {
                 QMessageBox::critical(this,
                                       tr("Fehler"),
-                                      tr("Bitte wählen Sie die Buchun, "
+                                      tr("Bitte wählen Sie die Buchung, "
                                          "die ersetzt werden soll."));
             }
         }
