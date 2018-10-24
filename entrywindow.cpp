@@ -408,7 +408,7 @@ void ASEntryWindow::documentSelected()
             DocModel * model = dynamic_cast<DocModel*>(m_docUi->tableView->model());
             if (model)
             {
-                m_selectedDocument = model->getTransactionByRow(mi.row());
+                m_selectedDocument = model->getTransactionByRow(mi.row() - 1);
                 if (m_selectedDocument)
                 {
                     documentSetup();
