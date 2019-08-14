@@ -1,9 +1,8 @@
 TEMPLATE = app
-TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-QT += xml
-CONFIG += debug
+QT += core widgets xml
+CONFIG += qt debug
 
 # Input
 HEADERS += aussackler.h \

@@ -136,7 +136,7 @@ void ASVatCategory::writeToXml(QDomDocument * doc, QDomElement * de)
     if (getParent())
     {
         QDomElement par = doc->createElement("parent");
-        QDomText t = doc->createTextNode(getParent()->getUuid());
+        QDomText t = doc->createTextNode(getParent()->getUuid().toString());
         par.appendChild(t);
         de->appendChild(par);
     }
@@ -345,14 +345,14 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
     if (getAccount() != NULL)
     {
         QDomElement e = doc->createElement("account");
-        QDomText t = doc->createTextNode(getAccount()->getUuid());
+        QDomText t = doc->createTextNode(getAccount()->getUuid().toString());
         e.appendChild(t);
         de->appendChild(e);
     }
     if (getCategory() != NULL)
     {
         QDomElement e = doc->createElement("category");
-        QDomText t = doc->createTextNode(getCategory()->getUuid());
+        QDomText t = doc->createTextNode(getCategory()->getUuid().toString());
         e.appendChild(t);
         de->appendChild(e);
     }
@@ -362,7 +362,7 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
         if (*it != NULL)
         {
             QDomElement e = doc->createElement("vatcategory");
-            QDomText t = doc->createTextNode((*it)->getUuid());
+            QDomText t = doc->createTextNode((*it)->getUuid().toString());
             e.appendChild(t);
             de->appendChild(e);
         }
@@ -370,7 +370,7 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
     if (getDocument() != NULL)
     {
         QDomElement e = doc->createElement("document");
-        QDomText t = doc->createTextNode(getDocument()->getUuid());
+        QDomText t = doc->createTextNode(getDocument()->getUuid().toString());
         e.appendChild(t);
         de->appendChild(e);
     }

@@ -49,22 +49,22 @@ signals:
     void signalSave(const QString fileName);
 
 private slots:
-    void on_actionNew_activated();
-    void on_actionLoad_activated();
-    void on_actionSave_activated();
-    void on_actionSaveas_activated();
-    void on_actionQuit_activated();
+    void on_actionNew_triggered();
+    void on_actionLoad_triggered();
+    void on_actionSave_triggered();
+    void on_actionSaveas_triggered();
+    void on_actionQuit_triggered();
 
-    void on_actionAddEntries_activated();
-    void on_actionNewEntry_activated();
-    void on_actionCorrectEntry_activated();
-    void on_actionDeleteEntry_activated();
-    void on_actionNewDocument_activated();
-    void on_actionCorrectDocument_activated();
-    void on_actionNewAccount_activated();
-    void on_actionNewCategory_activated();
-    void on_actionNewVatCategory_activated();
-    void on_actionSettings_activated();
+    void on_actionAddEntries_triggered();
+    void on_actionNewEntry_triggered();
+    void on_actionCorrectEntry_triggered();
+    void on_actionDeleteEntry_triggered();
+    void on_actionNewDocument_triggered();
+    void on_actionCorrectDocument_triggered();
+    void on_actionNewAccount_triggered();
+    void on_actionNewCategory_triggered();
+    void on_actionNewVatCategory_triggered();
+    void on_actionSettings_triggered();
 
     void on_tabWidget_currentChanged(int index);
 

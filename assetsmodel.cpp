@@ -98,7 +98,7 @@ QVariant AssetsModel::data(const QModelIndex& index, int role) const
         case 3:
             return tr("Anschaffungswert");
         case 4:
-            return trUtf8("Veränderung");
+            return tr("Veränderung");
         default:
             return QVariant();
         }

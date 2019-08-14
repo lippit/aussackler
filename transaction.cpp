@@ -138,11 +138,11 @@ void ASTransaction::commit()
 void ASTransaction::writeToXml(QDomDocument * doc, QDomElement * de)
 {
     de->setAttribute("type", TransactionTypeStrings[getType()]);
-    de->setAttribute("uuid", getUuid());
+    de->setAttribute("uuid", getUuid().toString());
     de->setAttribute("timestamp", getCreationTimestamp().toString());
     if (getOverride())
     {
-        de->setAttribute("overrides", getOverride()->getUuid());
+        de->setAttribute("overrides", getOverride()->getUuid().toString());
     }
     if (getHidden())
     {

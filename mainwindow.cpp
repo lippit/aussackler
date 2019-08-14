@@ -54,7 +54,23 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
         "Alle Dateien (*)"
         );
 
-    on_actionNew_activated();
+    connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(on_actionNew_triggered()));
+    connect(ui.actionLoad, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
+    connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(on_actionSave_triggered()));
+    connect(ui.actionSaveas, SIGNAL(triggered()), this, SLOT(on_actionSaveas_triggered()));
+    connect(ui.actionQuit, SIGNAL(triggered()), this, SLOT(on_actionQuit_triggered()));
+    connect(ui.actionAddEntries, SIGNAL(triggered()), this, SLOT(on_actionAddEntries_triggered()));
+    connect(ui.actionNewEntry, SIGNAL(triggered()), this, SLOT(on_actionNewEntry_triggered()));
+    connect(ui.actionCorrectEntry, SIGNAL(triggered()), this, SLOT(on_actionCorrectEntry_triggered()));
+    connect(ui.actionDeleteEntry, SIGNAL(triggered()), this, SLOT(on_actionDeleteEntry_triggered()));
+    connect(ui.actionNewDocument, SIGNAL(triggered()), this, SLOT(on_actionNewDocument_triggered()));
+    connect(ui.actionCorrectDocument, SIGNAL(triggered()), this, SLOT(on_actionCorrectDocument_triggered()));
+    connect(ui.actionNewAccount, SIGNAL(triggered()), this, SLOT(on_actionNewAccount_triggered()));
+    connect(ui.actionNewCategory, SIGNAL(triggered()), this, SLOT(on_actionNewCategory_triggered()));
+    connect(ui.actionNewVatCategory, SIGNAL(triggered()), this, SLOT(on_actionNewVatCategory_triggered()));
+    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(on_actionSettings_triggered()));
+
+    on_actionNew_triggered();
 }
 
 void ASMainWindow::connectModels()
@@ -90,7 +106,7 @@ void ASMainWindow::disconnectModels()
     }
 }
 
-void ASMainWindow::on_actionNew_activated()
+void ASMainWindow::on_actionNew_triggered()
 {
     disconnectModels();
 
@@ -144,7 +160,7 @@ void ASMainWindow::createEntryWindow()
     }
 }
 
-void ASMainWindow::on_actionAddEntries_activated()
+void ASMainWindow::on_actionAddEntries_triggered()
 {
     createEntryWindow();
 
@@ -154,14 +170,14 @@ void ASMainWindow::on_actionAddEntries_activated()
     }
 }
 
-void ASMainWindow::on_actionNewEntry_activated()
+void ASMainWindow::on_actionNewEntry_triggered()
 {
     createEntryWindow();
 
     entryWindow->exec();
 }
 
-void ASMainWindow::on_actionCorrectEntry_activated()
+void ASMainWindow::on_actionCorrectEntry_triggered()
 {
     createEntryWindow();
 
@@ -189,7 +205,7 @@ void ASMainWindow::on_actionCorrectEntry_activated()
     }
 }
 
-void ASMainWindow::on_actionDeleteEntry_activated()
+void ASMainWindow::on_actionDeleteEntry_triggered()
 {
     QItemSelectionModel * sm = ui.mainTable->selectionModel();
 
@@ -224,7 +240,7 @@ void ASMainWindow::on_actionDeleteEntry_activated()
     }
 }
 
-void ASMainWindow::on_actionNewDocument_activated()
+void ASMainWindow::on_actionNewDocument_triggered()
 {
     m_docOverride = NULL;
 
@@ -239,7 +255,7 @@ void ASMainWindow::on_actionNewDocument_activated()
     editDocDialog->show();
 }
 
-void ASMainWindow::on_actionCorrectDocument_activated()
+void ASMainWindow::on_actionCorrectDocument_triggered()
 {
     if (!docDialog->exec())
         return;
@@ -273,7 +289,7 @@ void ASMainWindow::on_actionCorrectDocument_activated()
     }
 }
 
-void ASMainWindow::on_actionNewAccount_activated()
+void ASMainWindow::on_actionNewAccount_triggered()
 {
     if (!accountDialog)
     {
@@ -298,7 +314,7 @@ void ASMainWindow::on_actionNewAccount_activated()
     accountDialog->show();
 }
 
-void ASMainWindow::on_actionNewCategory_activated()
+void ASMainWindow::on_actionNewCategory_triggered()
 {
     if (!categoryDialog)
     {
@@ -324,7 +340,7 @@ void ASMainWindow::on_actionNewCategory_activated()
     categoryDialog->show();
 }
 
-void ASMainWindow::on_actionNewVatCategory_activated()
+void ASMainWindow::on_actionNewVatCategory_triggered()
 {
     if (!vatCategoryDialog)
     {
@@ -354,7 +370,7 @@ void ASMainWindow::on_actionNewVatCategory_activated()
     vatCategoryDialog->show();
 }
 
-void ASMainWindow::on_actionSettings_activated()
+void ASMainWindow::on_actionSettings_triggered()
 {
     if (!settingsDialog)
     {
@@ -377,18 +393,18 @@ void ASMainWindow::on_actionSettings_activated()
     settingsDialog->show();
 }
 
-void ASMainWindow::on_actionSave_activated()
+void ASMainWindow::on_actionSave_triggered()
 {
     if (m_currentFileName.isEmpty())
     {
-        on_actionSaveas_activated();
+        on_actionSaveas_triggered();
         return;
     }
 
     emit signalSave(m_currentFileName);
 }
 
-void ASMainWindow::on_actionSaveas_activated()
+void ASMainWindow::on_actionSaveas_triggered()
 {
     m_currentFileName= QFileDialog::getSaveFileName(this,
                                                     tr("Speichern unter"),
@@ -396,11 +412,11 @@ void ASMainWindow::on_actionSaveas_activated()
 
     if (!m_currentFileName.isEmpty())
     {
-        on_actionSave_activated();
+        on_actionSave_triggered();
     }
 }
 
-void ASMainWindow::on_actionLoad_activated()
+void ASMainWindow::on_actionLoad_triggered()
 {
     m_currentFileName= QFileDialog::getOpenFileName(this,
                                                     tr("Datei laden"),
@@ -409,7 +425,7 @@ void ASMainWindow::on_actionLoad_activated()
     if (m_currentFileName.isEmpty())
         return;
 
-    on_actionNew_activated();
+    on_actionNew_triggered();
     disconnectModels();
 
     emit signalLoad(m_currentFileName);
@@ -419,7 +435,7 @@ void ASMainWindow::on_actionLoad_activated()
     m_populate = true;
 }
 
-void ASMainWindow::on_actionQuit_activated()
+void ASMainWindow::on_actionQuit_triggered()
 {
     close();
 }
