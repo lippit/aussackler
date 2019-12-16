@@ -101,8 +101,8 @@ void ASEntryWindow::on_expense_toggled(bool checked)
 {
     if (checked)
     {
-        double val = ui.amount->text().toDouble();
-        double vat = ui.vatAmount->text().toDouble();
+        double val = m_loc.toDouble(ui.amount->text());
+        double vat = m_loc.toDouble(ui.vatAmount->text());
         if (val > 0.0)
         {
             ui.amount->setText(QString::number(-val));
@@ -116,8 +116,8 @@ void ASEntryWindow::on_income_toggled(bool checked)
 {
 if (checked)
     {
-        double val = ui.amount->text().toDouble();
-        double vat = ui.vatAmount->text().toDouble();
+        double val = m_loc.toDouble(ui.amount->text());
+        double vat = m_loc.toDouble(ui.vatAmount->text());
         if (val < 0.0)
         {
             ui.amount->setText(QString::number(-val));
@@ -191,7 +191,7 @@ void ASEntryWindow::on_vatAmount_textEdited()
 
 void ASEntryWindow::on_totalAmount_textEdited()
 {
-    double totalAmount = ui.totalAmount->text().toDouble();
+    double totalAmount = m_loc.toDouble(ui.totalAmount->text());
 
     if (!ui.amount->isModified())
     {
@@ -211,7 +211,7 @@ void ASEntryWindow::on_totalAmount_textEdited()
     }
     else
     {
-        double amount = ui.amount->text().toDouble();
+        double amount = m_loc.toDouble(ui.amount->text());
         double vatAmount = totalAmount - amount;
         ui.vatAmount->setText(QString::number(vatAmount));
     }
@@ -248,8 +248,8 @@ void ASEntryWindow::on_buttonBox_accepted()
                           ui.vatCategory2->currentIndex()).value<void *>());
 
     e->setDescription(ui.entryDescription->text());
-    e->setAmount(ui.amount->text().toDouble());
-    e->setVatAmount(ui.vatAmount->text().toDouble());
+    e->setAmount(m_loc.toDouble(ui.amount->text()));
+    e->setVatAmount(m_loc.toDouble(ui.vatAmount->text()));
     e->setChargePercentage(ui.chargePercentage->value());
     e->setAccount((ASAccount*)ui.account->itemData(
                       ui.account->currentIndex()).value<void *>());
@@ -465,7 +465,7 @@ void ASEntryWindow::setEntryType()
 {
     if (!ui.invest->isChecked())
     {
-        double val = ui.amount->text().toDouble();
+        double val = m_loc.toDouble(ui.amount->text());
         if (val < 0.0)
         {
             ui.expense->setChecked(true);
@@ -488,7 +488,7 @@ void ASEntryWindow::calculateVat()
             vp = ac->getVatPercentage();
         if (vp >= 0)
         {
-            double vat = qRound(vp * ui.amount->text().toDouble()) / 100.0;
+            double vat = qRound(vp * m_loc.toDouble(ui.amount->text())) / 100.0;
             ui.vatAmount->setText(QString::number(vat));
         }
     }
@@ -496,8 +496,8 @@ void ASEntryWindow::calculateVat()
 
 void ASEntryWindow::calculateTotal()
 {
-    double amount = ui.amount->text().toDouble();
-    double vatAmount = ui.vatAmount->text().toDouble();
+    double amount = m_loc.toDouble(ui.amount->text());
+    double vatAmount = m_loc.toDouble(ui.vatAmount->text());
     double total = amount + vatAmount;
 
     ui.totalAmount->setText(QString::number(total));

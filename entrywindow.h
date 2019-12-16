@@ -68,6 +68,7 @@ private:
     ASTransaction * m_override;
     QCompleter * m_entryCompleter;
     QCompleter * m_docCompleter;
+    QLocale m_loc;
 
     void setEntryType();
     void calculateVat();
