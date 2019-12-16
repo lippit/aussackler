@@ -54,22 +54,6 @@ ASMainWindow::ASMainWindow(ASTransactionList * transactions,
         "Alle Dateien (*)"
         );
 
-    connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(on_actionNew_triggered()));
-    connect(ui.actionLoad, SIGNAL(triggered()), this, SLOT(on_actionLoad_triggered()));
-    connect(ui.actionSave, SIGNAL(triggered()), this, SLOT(on_actionSave_triggered()));
-    connect(ui.actionSaveas, SIGNAL(triggered()), this, SLOT(on_actionSaveas_triggered()));
-    connect(ui.actionQuit, SIGNAL(triggered()), this, SLOT(on_actionQuit_triggered()));
-    connect(ui.actionAddEntries, SIGNAL(triggered()), this, SLOT(on_actionAddEntries_triggered()));
-    connect(ui.actionNewEntry, SIGNAL(triggered()), this, SLOT(on_actionNewEntry_triggered()));
-    connect(ui.actionCorrectEntry, SIGNAL(triggered()), this, SLOT(on_actionCorrectEntry_triggered()));
-    connect(ui.actionDeleteEntry, SIGNAL(triggered()), this, SLOT(on_actionDeleteEntry_triggered()));
-    connect(ui.actionNewDocument, SIGNAL(triggered()), this, SLOT(on_actionNewDocument_triggered()));
-    connect(ui.actionCorrectDocument, SIGNAL(triggered()), this, SLOT(on_actionCorrectDocument_triggered()));
-    connect(ui.actionNewAccount, SIGNAL(triggered()), this, SLOT(on_actionNewAccount_triggered()));
-    connect(ui.actionNewCategory, SIGNAL(triggered()), this, SLOT(on_actionNewCategory_triggered()));
-    connect(ui.actionNewVatCategory, SIGNAL(triggered()), this, SLOT(on_actionNewVatCategory_triggered()));
-    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(on_actionSettings_triggered()));
-
     on_actionNew_triggered();
 }
 
