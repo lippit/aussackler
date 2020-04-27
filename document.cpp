@@ -115,7 +115,7 @@ void ASDocument::handleDomElement(QDomElement * de)
     QString n = de->tagName();
     if (n == "documentdate")
     {
-        setDocumentDate(QDate::fromString(de->text()));
+        setDocumentDate(parseDate(de->text()));
     } else if (n == "number")
     {
         setNumber(de->text());

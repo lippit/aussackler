@@ -17,6 +17,7 @@
  * along with Aussackler.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLocale>
 #include "entry.h"
 
 ASAccount::ASAccount(ASTransactionList * transactions,
@@ -420,7 +421,7 @@ void ASAccountEntry::handleDomElement(QDomElement * de)
     }
     else if (n == "date")
     {
-        setDate(QDate::fromString(de->text()));
+        setDate(parseDate(de->text()));
     }
     else
     {

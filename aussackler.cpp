@@ -136,9 +136,9 @@ void Aussackler::slotSaveFile(const QString fileName)
 
 int main(int argc, char * argv[])
 {
-    QApplication app(argc, argv);
-
     QLocale::setDefault(QLocale(QLocale::German, QLocale::Austria));
+
+    QApplication app(argc, argv);
 
     Aussackler as;
     if (argc > 1)

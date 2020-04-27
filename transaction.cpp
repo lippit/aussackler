@@ -202,3 +202,18 @@ bool ASTransaction::operator<(const ASTransaction &other) const
 {
     return m_creationTimestamp < other.m_creationTimestamp;
 }
+
+QDate ASTransaction::parseDate(const QString& dateString)
+{
+    QString copy(dateString);
+    QString replaced = copy
+            .replace("Mär", "Mar")
+            .replace("Mai", "May")
+            .replace("Okt", "Oct")
+            .replace("Dez", "Dec");
+    QDate date = QDate::fromString(replaced);
+    if (!date.isValid()) {
+        qCritical("Could not parse date in input: %s", qUtf8Printable(dateString));
+    }
+    return date;
+}

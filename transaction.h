@@ -24,6 +24,7 @@
  * Transaction base class
  */
 
+#include <QObject>
 #include <QString>
 #include <QHash>
 #include <QList>
@@ -120,6 +121,8 @@ public:
     // Comparison operators
     virtual bool operator>(const ASTransaction &other) const;
     virtual bool operator<(const ASTransaction &other) const;
+
+    static QDate parseDate(const QString& dateString);
 
     // Public members
 
