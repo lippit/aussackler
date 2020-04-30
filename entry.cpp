@@ -378,7 +378,7 @@ void ASAccountEntry::writeToXml(QDomDocument * doc, QDomElement * de)
     if (!getDate().isNull())
     {
         QDomElement e = doc->createElement("date");
-        QDomText t = doc->createTextNode(getDate().toString());
+        QDomText t = doc->createTextNode(getDate().toString(Qt::ISODate));
         e.appendChild(t);
         de->appendChild(e);
     }

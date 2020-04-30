@@ -139,7 +139,7 @@ void ASTransaction::writeToXml(QDomDocument * doc, QDomElement * de)
 {
     de->setAttribute("type", TransactionTypeStrings[getType()]);
     de->setAttribute("uuid", getUuid().toString());
-    de->setAttribute("timestamp", getCreationTimestamp().toString());
+    de->setAttribute("timestamp", getCreationTimestamp().toString(Qt::ISODate));
     if (getOverride())
     {
         de->setAttribute("overrides", getOverride()->getUuid().toString());
@@ -160,8 +160,7 @@ void ASTransaction::writeToXml(QDomDocument * doc, QDomElement * de)
 void ASTransaction::readFromXml(QDomElement * de)
 {
     m_uuid = de->attribute("uuid");
-    m_creationTimestamp =
-        QDateTime::fromString(de->attribute("timestamp"));
+    m_creationTimestamp = parseDateTime(de->attribute("timestamp"));
     if (de->hasAttribute("overrides"))
     {
         QUuid overrides = de->attribute("overrides");
@@ -206,14 +205,39 @@ bool ASTransaction::operator<(const ASTransaction &other) const
 QDate ASTransaction::parseDate(const QString& dateString)
 {
     QString copy(dateString);
-    QString replaced = copy
-            .replace("Mär", "Mar")
-            .replace("Mai", "May")
-            .replace("Okt", "Oct")
-            .replace("Dez", "Dec");
-    QDate date = QDate::fromString(replaced);
+    QDate date = QDate::fromString(copy, Qt::ISODate);
+    if (!date.isValid()) {
+        QString replaced = copy
+                .replace("Mär", "Mar")
+                .replace("Mai", "May")
+                .replace("Okt", "Oct")
+                .replace("Dez", "Dec");
+        date = QDate::fromString(replaced);
+    }
     if (!date.isValid()) {
         qCritical("Could not parse date in input: %s", qUtf8Printable(dateString));
     }
     return date;
+}
+
+QDateTime ASTransaction::parseDateTime(const QString& dateString)
+{
+    if (dateString.isEmpty()) {
+        return QDateTime();
+    }
+
+    QString copy(dateString);
+    QDateTime timestamp = QDateTime::fromString(copy, Qt::ISODate);
+    if (!timestamp.isValid()) {
+        QString replaced = copy
+                .replace("Mär", "Mar")
+                .replace("Mai", "May")
+                .replace("Okt", "Oct")
+                .replace("Dez", "Dec");
+        timestamp = QDateTime::fromString(replaced);
+    }
+    if (!timestamp.isValid()) {
+        qCritical("Could not parse date in input: %s", qUtf8Printable(dateString));
+    }
+    return timestamp;
 }

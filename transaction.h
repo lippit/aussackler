@@ -123,6 +123,7 @@ public:
     virtual bool operator<(const ASTransaction &other) const;
 
     static QDate parseDate(const QString& dateString);
+    static QDateTime parseDateTime(const QString& dateString);
 
     // Public members
 

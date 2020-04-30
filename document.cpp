@@ -85,7 +85,7 @@ void ASDocument::writeToXml(QDomDocument * doc, QDomElement * de)
     if (!getDocumentDate().isNull())
     {
         QDomElement e = doc->createElement("documentdate");
-        QDomText t = doc->createTextNode(getDocumentDate().toString());
+        QDomText t = doc->createTextNode(getDocumentDate().toString(Qt::ISODate));
         e.appendChild(t);
         de->appendChild(e);
     }
