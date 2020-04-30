@@ -8,7 +8,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Aussackler is distributed in the hope that it will 
+ * Aussackler is distributed in the hope that it will
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -33,6 +33,8 @@ ASEntryWindow::ASEntryWindow(ASTransactionList * transactions,
     m_selectedDocument(NULL),
     m_override(NULL)
 {
+    m_loc = QLocale();
+
     ui.setupUi(this);
     ui.transactionDate->setDate(QDate::currentDate());
     ui.documentDate->setDate(QDate::currentDate());
@@ -105,8 +107,8 @@ void ASEntryWindow::on_expense_toggled(bool checked)
         double vat = m_loc.toDouble(ui.vatAmount->text());
         if (val > 0.0)
         {
-            ui.amount->setText(QString::number(-val));
-            ui.vatAmount->setText(QString::number(-vat));
+            ui.amount->setText(m_loc.toString(-val));
+            ui.vatAmount->setText(m_loc.toString(-vat));
             calculateTotal();
         }
     }
@@ -120,8 +122,8 @@ if (checked)
         double vat = m_loc.toDouble(ui.vatAmount->text());
         if (val < 0.0)
         {
-            ui.amount->setText(QString::number(-val));
-            ui.vatAmount->setText(QString::number(-vat));
+            ui.amount->setText(m_loc.toString(-val));
+            ui.vatAmount->setText(m_loc.toString(-vat));
             calculateTotal();
         }
     }
@@ -205,15 +207,15 @@ void ASEntryWindow::on_totalAmount_textEdited()
             double amount = qRound(100.0 * totalAmount /
                                    (1.0 + (vp / 100.0))) / 100.0;
             double vatAmount = totalAmount - amount;
-            ui.amount->setText(QString::number(amount));
-            ui.vatAmount->setText(QString::number(vatAmount));
+            ui.amount->setText(m_loc.toString(amount));
+            ui.vatAmount->setText(m_loc.toString(vatAmount));
         }
     }
     else
     {
         double amount = m_loc.toDouble(ui.amount->text());
         double vatAmount = totalAmount - amount;
-        ui.vatAmount->setText(QString::number(vatAmount));
+        ui.vatAmount->setText(m_loc.toString(vatAmount));
     }
     setEntryType();
 }
@@ -389,8 +391,8 @@ void ASEntryWindow::fillFields(ASAccountEntry * ae)
     }
     ui.entryDescription->setText(ae->getDescription());
     ui.transactionDate->setDate(ae->getDate());
-    ui.amount->setText(QString::number(ae->getAmount()));
-    ui.vatAmount->setText(QString::number(ae->getVatAmount()));
+    ui.amount->setText(m_loc.toString(ae->getAmount()));
+    ui.vatAmount->setText(m_loc.toString(ae->getVatAmount()));
     ui.chargePercentage->setValue(ae->getChargePercentage());
     setEntryType();
     calculateTotal();
@@ -489,7 +491,7 @@ void ASEntryWindow::calculateVat()
         if (vp >= 0)
         {
             double vat = qRound(vp * m_loc.toDouble(ui.amount->text())) / 100.0;
-            ui.vatAmount->setText(QString::number(vat));
+            ui.vatAmount->setText(m_loc.toString(vat));
         }
     }
 }
@@ -500,5 +502,5 @@ void ASEntryWindow::calculateTotal()
     double vatAmount = m_loc.toDouble(ui.vatAmount->text());
     double total = amount + vatAmount;
 
-    ui.totalAmount->setText(QString::number(total));
+    ui.totalAmount->setText(m_loc.toString(total));
 }
